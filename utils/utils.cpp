@@ -1,9 +1,8 @@
 #include "../headers/utils.hpp"
 
-std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects()
+std::tuple<SDL_Window*, SDL_Renderer*> GetSDLobjects()
 {
     SDL_Window* window;
-    SDL_Surface* surface;
     SDL_Renderer* renderer;
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -24,13 +23,6 @@ std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects()
         goto error;
     }
 
-    surface = SDL_GetWindowSurface(window);
-    if(!surface)
-    {
-        std::cout << "Failed to get the surface from the window\n";
-        goto error;
-    }
-
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(!renderer)
     {
@@ -38,7 +30,7 @@ std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects()
         goto error;
     }
     
-    return std::make_tuple(window, surface, renderer);
+    return std::make_tuple(window, renderer);
 
 error:
     std::cout << "Some allocation failed in initialization of SDL objects\n";

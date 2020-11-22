@@ -5,6 +5,6 @@
 #include <tuple>
 #include <SDL2/SDL.h>
 
-std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects();
+std::tuple<SDL_Window*, SDL_Renderer*> GetSDLobjects();
 
 #endif

@@ -9,21 +9,19 @@ class BaseState
 protected:
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Surface *surface;
     SDL_Event *event;
     bool active;
 
 public:
-    BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event);
+    BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~BaseState();
     void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void handle_user_input();
 };
 
-BaseState::BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event)
+BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
 {
     this->window = window;
-    this->surface = surface;
     this->renderer = renderer;
     this->event = event;
     active = false;
@@ -58,17 +56,14 @@ void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 class Boids : BaseState
 {
 public:
-    Boids(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event)
-        : BaseState(window, surface, renderer, event)
-    {
-    }
+    Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
+        : BaseState(window, renderer, event) {};
 
     int run()
     {
-        SDL_UpdateWindowSurface(window);
+        active = true;
 
         int i = 0;
-        active = true;
         while (active)
         {
             handle_user_input();
@@ -93,15 +88,14 @@ public:
 int main(int argc, char **argv)
 {
     SDL_Window *window;
-    SDL_Surface *surface;
     SDL_Renderer *renderer;
     SDL_Event event;
 
-    std::tie(window, surface, renderer) = GetSDLobjects();
+    std::tie(window, renderer) = GetSDLobjects();
 
-    Boids boids(window, surface, renderer, &event);
+    Boids boids(window, renderer, &event);
     boids.run();
-    
+
     /* Free all objects*/
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
