@@ -14,28 +14,24 @@ protected:
     bool active;
 
 public:
-    BaseState(SDL_Window* window, SDL_Surface* surface, SDL_Renderer* renderer);
-
-    /*
-     * Lol
-     */
+    BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event);
+    ~BaseState();
     void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void handle_user_input();
 };
 
-BaseState::BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer)
+BaseState::BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event)
 {
     this->window = window;
     this->surface = surface;
     this->renderer = renderer;
+    this->event = event;
     active = false;
 }
 
-void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+BaseState::~BaseState()
 {
-    // Fill sceen with black
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    SDL_RenderClear(renderer);
+    delete event;
 }
 
 void BaseState::handle_user_input()
@@ -52,22 +48,24 @@ void BaseState::handle_user_input()
     }
 }
 
+void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    // Fill sceen with black
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_RenderClear(renderer);
+}
+
 class Boids : BaseState
 {
 public:
-    Boids(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer)
-        : BaseState(window, surface, renderer)
+    Boids(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer, SDL_Event *event)
+        : BaseState(window, surface, renderer, event)
     {
-        
     }
 
     int run()
     {
-        std::cout << "Debug1\n";
         SDL_UpdateWindowSurface(window);
-        std::cout << "Debug2\n";
-
-        SDL_Event e;
 
         int i = 0;
         active = true;
@@ -97,12 +95,13 @@ int main(int argc, char **argv)
     SDL_Window *window;
     SDL_Surface *surface;
     SDL_Renderer *renderer;
+    SDL_Event event;
 
     std::tie(window, surface, renderer) = GetSDLobjects();
 
-    Boids boids(window, surface, renderer);
+    Boids boids(window, surface, renderer, &event);
     boids.run();
-
+    
     /* Free all objects*/
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

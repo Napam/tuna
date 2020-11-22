@@ -1,8 +1,5 @@
 #include "../headers/utils.hpp"
 
-
-
-
 std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects()
 {
     SDL_Window* window;
@@ -40,6 +37,7 @@ std::tuple<SDL_Window*, SDL_Surface*, SDL_Renderer*> GetSDLobjects()
         std::cout << "Failed to get the renderer from the window\n";
         goto error;
     }
+    
     return std::make_tuple(window, surface, renderer);
 
 error:

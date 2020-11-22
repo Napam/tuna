@@ -2,11 +2,9 @@ CPPC = g++
 OUT_FILE = boids.out
 COMPILER_FLAGS = -o $(OUT_FILE)
 
-HEADERS = headers/manager.hpp \
-		  headers/utils.hpp \
+HEADERS = headers/utils.hpp \
 
 SOURCES = main.cpp \
-		  states/manager.cpp \
 		  utils/utils.cpp
 
 all:
