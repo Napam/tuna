@@ -1,75 +1,85 @@
 #include <iostream>
 #include <tuple>
 #include <SDL2/SDL.h>
-#include "utils.h"
+#include "headers/utils.hpp"
+// #include "headers/base_state.hpp"
 
 class BaseState
 {
 protected:
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Surface* surface;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Surface *surface;
+    SDL_Event *event;
+    bool active;
 
 public:
-    void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+    BaseState(SDL_Window* window, SDL_Surface* surface, SDL_Renderer* renderer);
+
+    /*
+     * Lol
+     */
+    void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+    void handle_user_input();
+};
+
+BaseState::BaseState(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer)
+{
+    this->window = window;
+    this->surface = surface;
+    this->renderer = renderer;
+    active = false;
+}
+
+void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    // Fill sceen with black
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_RenderClear(renderer);
+}
+
+void BaseState::handle_user_input()
+{
+    while (SDL_PollEvent(event) > 0)
     {
-        // Fill sceen with black
-        SDL_SetRenderDrawColor(renderer, r, g, b, a);
-        SDL_RenderClear(renderer);
+        switch (event->type)
+        {
+        case SDL_QUIT:
+            active = false;
+        case SDLK_F4:
+            active = false;
+        }
     }
-};
+}
 
-
-class BaseGameObject
+class Boids : BaseState
 {
 public:
-    void draw();
-    void interact();
-};
-
-class Square
-{
-
-};
-
-class Boids:BaseState
-{
-public:
-    Boids(SDL_Window* window, SDL_Surface* surface, SDL_Renderer* renderer) 
+    Boids(SDL_Window *window, SDL_Surface *surface, SDL_Renderer *renderer)
+        : BaseState(window, surface, renderer)
     {
-        this->window = window;
-        this->surface = surface;
-        this->renderer = renderer;
+        
     }
 
     int run()
     {
+        std::cout << "Debug1\n";
         SDL_UpdateWindowSurface(window);
+        std::cout << "Debug2\n";
 
-        bool run = true;
         SDL_Event e;
 
         int i = 0;
-        while (run)
+        active = true;
+        while (active)
         {
-            while (SDL_PollEvent(&e) > 0) 
-            {
-                switch (e.type) 
-                {
-                    case SDL_QUIT:
-                        run = false;
-                        break;
-                }
-            }
-
+            handle_user_input();
             // Create a square
             // create a black square
-            SDL_Rect rect= {i,i,10+i,10+i}; // x, y, width, height
-    
-            // std::cout << "i = " << i <<"\n";
-            
+            SDL_Rect rect = {i, i, 10 + i, 10 + i}; // x, y, width, height
+
             // Fill sceen with black
-            clearfill(0,0,0,255);
+            clearfill(0, 0, 0, 255);
 
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             SDL_RenderDrawRect(renderer, &rect);
@@ -81,7 +91,6 @@ public:
         return 0;
     }
 };
-
 
 int main(int argc, char **argv)
 {

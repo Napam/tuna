@@ -2,6 +2,6 @@
 
 g++ -o boids.out \
     main.cpp\
-    utils.cpp\
-    utils.h\
+    utils/utils.cpp\
+    headers/utils.hpp\
  -lSDL2  && ./boids.out
