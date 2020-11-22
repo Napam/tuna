@@ -1,4 +1,4 @@
-#include "../headers/utils.hpp"
+#include "../include/utils.hpp"
 
 std::tuple<SDL_Window*, SDL_Renderer*> GetSDLobjects()
 {
@@ -23,7 +23,7 @@ std::tuple<SDL_Window*, SDL_Renderer*> GetSDLobjects()
         goto error;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(!renderer)
     {
         std::cout << "Failed to get the renderer from the window\n";
