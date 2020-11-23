@@ -1,74 +1,135 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <vector>
 #include "../include/boids_state.hpp"
-// #include "../include/base_state.hpp"
 
+class Squareboy
+{
+public:
+    SDL_Rect rect;
+    Boids *boids;
+    Squareboy(Boids *boids, int x, int y, int w, int h);
+    void interact_user();
+    void interact_state();
+    void logic();
+    void update();
+    void blit();
+};
+
+Squareboy::Squareboy(Boids *boids, int x, int y, int w, int h)
+{
+    rect = {x, y, w, h};
+    this->boids = boids;
+}
+
+void Squareboy::blit()
+{
+    SDL_SetRenderDrawColor(boids->renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(boids->renderer, &rect);
+}
+
+void Squareboy::interact_user()
+{
+    switch (boids->keyinput)
+    {
+    case SDLK_a:
+        rect.x -= 1;
+        break;
+    case SDLK_d:
+        rect.x += 1;
+        break;
+    case SDLK_w:
+        rect.y -= 1;
+        break;
+    case SDLK_s:
+        rect.y += 1;
+        break;
+    default:
+        break;
+    }
+}
+
+void Squareboy::interact_state()
+{
+}
+
+void Squareboy::update()
+{
+    interact_user();
+    interact_state();
+}
+
+// -------------------------------------------------------------------------- //
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : BaseState(window, renderer, event)
 {
-    i = 0;
-    rect = {100, 100, 10, 10};
-    speed = 6;
+    entities = new std::vector<void *>;
+
+    for (int i=0; i < 7; i++)
+    {
+        for (int j=0; j < 7; j++)
+        {
+            entities->emplace_back(new Squareboy(this, 100+i*25, 100+j*25, 20, 20));
+        }
+    }
 };
+
+Boids::~Boids()
+{
+    for (void *ent : *entities)
+    {
+        delete (Squareboy *)ent;
+    }
+    delete entities;
+}
 
 void Boids::update_graphics()
 {
     // Fill sceen with black
     clearfill(0, 0, 0, 255);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(renderer, &rect);
+    for (void *ent : *entities)
+    {
+        ((Squareboy *)ent)->blit();
+    }
 
-    // Switch
+    // Flip
     SDL_RenderPresent(renderer);
-    SDL_Delay(30);
 }
 
 void Boids::logic()
 {
-}
-
-void Boids::interact_user()
-{
-    std::cout << keyinput << "\n";
-    switch (keyinput)
+    for (void *ent : *entities)
     {
-    case SDLK_LEFT:
-        rect.x -= speed;
-        break;
-    case SDLK_RIGHT:
-        rect.x += speed;
-        break;
-    case SDLK_UP:
-        rect.y -= speed;
-        break;
-    case SDLK_DOWN:
-        rect.y += speed;
-        break;
-    case SDLK_a:
-        rect.x -= speed;
-        break;
-    case SDLK_d:
-        rect.x += speed;
-        break;
-    case SDLK_w:
-        rect.y -= speed;
-        break;
-    case SDLK_s:
-        rect.y += speed;
-        break;
+        ((Squareboy *)ent)->update();
     }
 }
 
+void Boids::interact_user() {}
+
 int Boids::run()
 {
+    Uint32 time, timedelta;
     activate();
+
+    float target_fps = 60;
+    float target_frametime = 1000 / target_fps; // ms
+    timedelta = target_frametime;
     while (active)
     {
+        time = SDL_GetTicks();
         handle_user_input();
         interact_user();
         logic();
         update_graphics();
+        timedelta = SDL_GetTicks() - time;
+
+        if (timedelta < target_frametime)
+        {
+            SDL_Delay(target_frametime - timedelta);
+        }
+
+        // std::cout << SDL_GetTicks() - time << std::endl;
     }
 
     return 0;

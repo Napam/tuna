@@ -3,18 +3,14 @@
 
 #include <SDL2/SDL.h>
 #include "../include/base_state.hpp"
-#include "../include/boids_state.hpp"
+#include <vector>
 
-class Boids : BaseState
+class Boids : public BaseState
 {
-private:
-    SDL_Rect rect;
-
 public:
-    int speed;
-    Uint16 i;
-
+    std::vector<void*> *entities;
     Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
+    ~Boids();
     void update_graphics();
     void logic();
     void interact_user();

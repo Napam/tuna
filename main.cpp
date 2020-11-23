@@ -11,10 +11,12 @@ int main(int argc, char **argv)
     SDL_Renderer *renderer;
     SDL_Event event;
 
-    std::tie(window, renderer) = GetSDLobjects();
+    CreateWindowAndRenderer(&window, &renderer);
 
-    Boids boids(window, renderer, &event);
-    boids.run();
+    Boids *boids = new Boids(window, renderer, &event);
+    boids->run();
+
+    delete boids;
 
     /* Free all objects*/
     SDL_DestroyRenderer(renderer);

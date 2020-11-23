@@ -2,9 +2,8 @@
 #define UTILS_H
 
 #include <iostream>
-#include <tuple>
 #include <SDL2/SDL.h>
 
-std::tuple<SDL_Window*, SDL_Renderer*> GetSDLobjects();
+void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer);
 
 #endif

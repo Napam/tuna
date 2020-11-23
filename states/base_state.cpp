@@ -36,7 +36,7 @@ void BaseState::handle_user_input()
                 break;
             }
             break;
-
+        
         case SDL_KEYUP:
             keyinput = 0;
         }

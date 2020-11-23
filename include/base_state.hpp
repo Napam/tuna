@@ -6,13 +6,15 @@
 class BaseState
 {
 protected:
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Event *event;
     bool active;
-    SDL_Keycode keyinput;
 
 public:
+    SDL_Event *event;
+    SDL_Keycode keyinput;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    Uint32 timedelta;
+
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~BaseState();
     void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
