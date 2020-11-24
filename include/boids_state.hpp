@@ -11,9 +11,9 @@ public:
     std::vector<void*> *entities;
     Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~Boids();
-    void update_graphics();
+    void updateGraphics();
     void logic();
-    void interact_user();
+    void interactUser();
     int run();
 };
 

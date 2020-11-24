@@ -1,25 +1,80 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <vector>
+#include "../include/base_state.hpp"
 #include "../include/boids_state.hpp"
+#include <eigen3/Eigen/Dense>
 
-class Squareboy
+using namespace Eigen;
+
+class Squareboy : public StateEventListener
 {
 public:
     SDL_Rect rect;
     Boids *boids;
+    Array2i position;
+    Array2i velocity;
     Squareboy(Boids *boids, int x, int y, int w, int h);
-    void interact_user();
-    void interact_state();
-    void logic();
+    void interactUser();
+    void behave();
     void update();
     void blit();
+    void motion();
+    void setPosition(int x, int y);
+    virtual void onKeyDown(SDL_Keycode key);
+    virtual void onKeyUp(SDL_Keycode key);
 };
 
 Squareboy::Squareboy(Boids *boids, int x, int y, int w, int h)
+    : boids(boids), position(x, y), velocity(0, 0)
 {
-    rect = {x, y, w, h};
-    this->boids = boids;
+    rect = {position[0] - w / 2, position[1] - h / 2, w, h};
+    boids->addInputEventListener(this);
+}
+
+void Squareboy::onKeyDown(SDL_Keycode key)
+{
+    std::cout << "Listen on DOWN: " << key << "\n";
+    switch (key)
+    {
+    case SDLK_a:
+        velocity[0] += -1;
+        break;
+    case SDLK_d:
+        velocity[0] += 1;
+        break;
+    case SDLK_w:
+        velocity[1] += -1;
+        break;
+    case SDLK_s:
+        velocity[1] += 1;
+        break;
+    default:
+        break;
+    }
+}
+
+void Squareboy::onKeyUp(SDL_Keycode key)
+{
+    std::cout << "Listen on UP: " << key << "\n";
+    // return;
+    switch (key)
+    {
+    case SDLK_a:
+        velocity[0] = 0;
+        break;
+    case SDLK_d:
+        velocity[0] = 0;
+        break;
+    case SDLK_w:
+        velocity[1] = 0;
+        break;
+    case SDLK_s:
+        velocity[1] = 0;
+        break;
+    default:
+        break;
+    }
 }
 
 void Squareboy::blit()
@@ -28,35 +83,37 @@ void Squareboy::blit()
     SDL_RenderDrawRect(boids->renderer, &rect);
 }
 
-void Squareboy::interact_user()
+void Squareboy::interactUser()
 {
-    switch (boids->keyinput)
+}
+
+void Squareboy::behave()
+{
+    int w, h;
+    SDL_GetWindowSize(boids->window, &w, &h);
+
+    if (position[0] + rect.w / 2 > w)
     {
-    case SDLK_a:
-        rect.x -= 1;
-        break;
-    case SDLK_d:
-        rect.x += 1;
-        break;
-    case SDLK_w:
-        rect.y -= 1;
-        break;
-    case SDLK_s:
-        rect.y += 1;
-        break;
-    default:
-        break;
+        position[0] = rect.w / 2;
+    }
+    else if (position[0] - rect.w / 2 < 0)
+    {
+        position[0] = w - rect.w / 2;
     }
 }
 
-void Squareboy::interact_state()
+void Squareboy::motion()
 {
+    position = position + velocity;
+    rect.x = position[0] - rect.w / 2;
+    rect.y = position[1] - rect.h / 2;
 }
 
 void Squareboy::update()
 {
-    interact_user();
-    interact_state();
+    interactUser();
+    behave();
+    motion();
 }
 
 // -------------------------------------------------------------------------- //
@@ -65,11 +122,12 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
 {
     entities = new std::vector<void *>;
 
-    for (int i=0; i < 7; i++)
+    // Grid of squarebois
+    for (int i = 0; i < 3; i++)
     {
-        for (int j=0; j < 7; j++)
+        for (int j = 0; j < 3; j++)
         {
-            entities->emplace_back(new Squareboy(this, 100+i*25, 100+j*25, 20, 20));
+            entities->emplace_back(new Squareboy(this, 100 + i * 25, 100 + j * 25, 20, 20));
         }
     }
 };
@@ -83,7 +141,7 @@ Boids::~Boids()
     delete entities;
 }
 
-void Boids::update_graphics()
+void Boids::updateGraphics()
 {
     // Fill sceen with black
     clearfill(0, 0, 0, 255);
@@ -105,7 +163,9 @@ void Boids::logic()
     }
 }
 
-void Boids::interact_user() {}
+void Boids::interactUser()
+{
+}
 
 int Boids::run()
 {
@@ -119,9 +179,9 @@ int Boids::run()
     {
         time = SDL_GetTicks();
         handle_user_input();
-        interact_user();
+        interactUser();
         logic();
-        update_graphics();
+        updateGraphics();
         timedelta = SDL_GetTicks() - time;
 
         if (timedelta < target_frametime)

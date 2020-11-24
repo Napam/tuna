@@ -2,15 +2,27 @@
 #define BASE_STATE_H
 
 #include <SDL2/SDL.h>
+#include <vector>
+
+class StateEventListener
+{
+public:
+    virtual ~StateEventListener() {};
+    virtual void onKeyDown(SDL_Keycode key) = 0;
+    virtual void onKeyUp(SDL_Keycode key) = 0;
+};
 
 class BaseState
 {
 protected:
-    bool active;
+    std::vector<StateEventListener *> *inputEventListeners;
 
 public:
+    bool active;
+    bool eventHappened;
     SDL_Event *event;
-    SDL_Keycode keyinput;
+    SDL_Keycode keydown;
+    SDL_Keycode keyup;
     SDL_Window *window;
     SDL_Renderer *renderer;
     Uint32 timedelta;
@@ -20,6 +32,7 @@ public:
     void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void handle_user_input();
     void activate();
+    void addInputEventListener(StateEventListener *listener);
 };
 
 #endif
