@@ -29,52 +29,15 @@ Squareboy::Squareboy(Boids *boids, int x, int y, int w, int h)
     : boids(boids), position(x, y), velocity(0, 0)
 {
     rect = {position[0] - w / 2, position[1] - h / 2, w, h};
-    boids->addInputEventListener(this);
+    // boids->addInputEventListener(this);
 }
 
 void Squareboy::onKeyDown(SDL_Keycode key)
 {
-    std::cout << "Listen on DOWN: " << key << "\n";
-    switch (key)
-    {
-    case SDLK_a:
-        velocity[0] += -1;
-        break;
-    case SDLK_d:
-        velocity[0] += 1;
-        break;
-    case SDLK_w:
-        velocity[1] += -1;
-        break;
-    case SDLK_s:
-        velocity[1] += 1;
-        break;
-    default:
-        break;
-    }
 }
 
 void Squareboy::onKeyUp(SDL_Keycode key)
 {
-    std::cout << "Listen on UP: " << key << "\n";
-    // return;
-    switch (key)
-    {
-    case SDLK_a:
-        velocity[0] = 0;
-        break;
-    case SDLK_d:
-        velocity[0] = 0;
-        break;
-    case SDLK_w:
-        velocity[1] = 0;
-        break;
-    case SDLK_s:
-        velocity[1] = 0;
-        break;
-    default:
-        break;
-    }
 }
 
 void Squareboy::blit()
@@ -85,6 +48,32 @@ void Squareboy::blit()
 
 void Squareboy::interactUser()
 {
+    const Uint8 *keys = boids->keystates;
+    
+    if (keys[SDL_SCANCODE_A]) 
+    {
+        velocity[0] -= 1;
+    }
+    
+    if (keys[SDL_SCANCODE_D]) 
+    {
+        velocity[0] += 1;
+    }
+    
+    if (keys[SDL_SCANCODE_W]) 
+    {
+        velocity[1] -= 1;
+    }
+    
+    if (keys[SDL_SCANCODE_S]) 
+    {
+        velocity[1] += 1;
+    }
+    
+    if (keys[SDL_SCANCODE_SPACE]) 
+    {
+        velocity = 0;
+    }
 }
 
 void Squareboy::behave()
@@ -100,10 +89,19 @@ void Squareboy::behave()
     {
         position[0] = w - rect.w / 2;
     }
+    else if (position[1] + rect.h / 2 > h)
+    {
+        position[1] = rect.h / 2;
+    }
+    else if (position[1] - rect.h / 2 < 0)
+    {
+        position[1] = h - rect.h / 2;
+    }
 }
 
 void Squareboy::motion()
 {
+    velocity = velocity.min(2).max(-2);
     position = position + velocity;
     rect.x = position[0] - rect.w / 2;
     rect.y = position[1] - rect.h / 2;
@@ -116,7 +114,13 @@ void Squareboy::update()
     motion();
 }
 
-// -------------------------------------------------------------------------- //
+// ############################################################################################# //
+// ############################################################################################# //
+// ############################################################################################# //
+// ############################################################################################# //
+// ############################################################################################# //
+// ############################################################################################# //
+
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : BaseState(window, renderer, event)
 {
@@ -167,30 +171,13 @@ void Boids::interactUser()
 {
 }
 
-int Boids::run()
-{
-    Uint32 time, timedelta;
-    activate();
-
-    float target_fps = 60;
-    float target_frametime = 1000 / target_fps; // ms
-    timedelta = target_frametime;
-    while (active)
-    {
-        time = SDL_GetTicks();
-        handle_user_input();
-        interactUser();
-        logic();
-        updateGraphics();
-        timedelta = SDL_GetTicks() - time;
-
-        if (timedelta < target_frametime)
-        {
-            SDL_Delay(target_frametime - timedelta);
-        }
-
-        // std::cout << SDL_GetTicks() - time << std::endl;
-    }
-
-    return 0;
+/*
+What to do in one iteration in game loop, will be called by BaseState::run, no need to 
+manually write game loop here
+*/
+void Boids::update()
+{   
+    interactUser();
+    logic();
+    updateGraphics();
 }

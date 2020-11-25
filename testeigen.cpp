@@ -8,11 +8,11 @@ int main(int argc, char **argv)
     Array<int, 3, 1> a;
     Array<int, 3, 1> b;
 
-    a << 1, 2, 3;
+    a << -4, 1, 4;
     b << 1, 2, 3;
     
 
-    std::cout << a + b << std::endl;
+    std::cout << a.min(3) << std::endl;
     
     return 0;
 }

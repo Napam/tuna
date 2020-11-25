@@ -1,9 +1,37 @@
 #include "../include/base_state.hpp"
 #include <iostream>
 
+class FPSController
+{
+public:
+    Uint8 targetFps;
+    float targetFrameTime;
+    float timeDelta;
+    Uint32 prevTime;
+
+    FPSController(Uint8 targetFps);
+    void operator()();
+};
+
+FPSController::FPSController(Uint8 targetFps)
+    : targetFps(targetFps), targetFrameTime(1000 / targetFps), timeDelta(targetFrameTime),
+      prevTime(SDL_GetTicks()) {}
+
+void FPSController::operator()()
+{
+    Uint32 time = SDL_GetTicks();
+    timeDelta = time - prevTime;
+    prevTime = time;
+
+    if (timeDelta < targetFrameTime)
+    {
+        SDL_Delay(targetFrameTime - timeDelta);
+    }
+}
+
 BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
-      inputEventListeners(new std::vector<StateEventListener *>)
+      inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL))
 {
 }
 
@@ -17,15 +45,11 @@ void BaseState::addInputEventListener(StateEventListener *listener)
     inputEventListeners->emplace_back(listener);
 }
 
-void BaseState::handle_user_input()
+void BaseState::handleUserInput()
 {
-    // TODO: Smarter keystroke recollection
-    // Hold down a button, and then another will make it
-    // forget that the first button is still pressed down etc...
-
+    // Polling events updates keystates, VERY IMPORTANT!!!
     while (SDL_PollEvent(event) > 0)
     {
-        // std::cout << event->type << std::endl;
         switch (event->type)
         {
         case SDL_QUIT:
@@ -37,7 +61,8 @@ void BaseState::handle_user_input()
             switch (keydown)
             {
             case SDLK_F4:
-                active = false;
+                if ((*event).key.keysym.mod == SDLK_LALT)
+                    active = false;
                 break;
             }
 
@@ -68,4 +93,17 @@ void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 void BaseState::activate()
 {
     active = true;
+}
+
+void BaseState::run()
+{
+    activate();
+    FPSController fps(60);
+
+    while (active)
+    {
+        handleUserInput();
+        update();
+        fps();
+    }
 }

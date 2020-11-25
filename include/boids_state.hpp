@@ -14,7 +14,7 @@ public:
     void updateGraphics();
     void logic();
     void interactUser();
-    int run();
+    virtual void update();
 };
 
 #endif
