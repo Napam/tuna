@@ -1,37 +1,22 @@
 #include "../include/base_state.hpp"
 #include <iostream>
 
-class FPSController
-{
-public:
-    Uint8 targetFps;
-    float targetFrameTime;
-    float timeDelta;
-    Uint32 prevTime;
-
-    FPSController(Uint8 targetFps);
-    void operator()();
-};
-
-FPSController::FPSController(Uint8 targetFps)
-    : targetFps(targetFps), targetFrameTime(1000 / targetFps), timeDelta(targetFrameTime),
+Clock::Clock(Uint8 targetFps)
+    : targetFps(targetFps), targetFrameTime(1000 / targetFps), dt(targetFrameTime),
       prevTime(SDL_GetTicks()) {}
 
-void FPSController::operator()()
+void Clock::fpsControll()
 {
-    Uint32 time = SDL_GetTicks();
-    timeDelta = time - prevTime;
-    prevTime = time;
-
-    if (timeDelta < targetFrameTime)
-    {
-        SDL_Delay(targetFrameTime - timeDelta);
-    }
+    dt = SDL_GetTicks() - prevTime;
+    if (dt < targetFrameTime)
+        SDL_Delay(targetFrameTime - dt);
+    prevTime = SDL_GetTicks();
 }
 
 BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
-      inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL))
+      inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL)),
+      clock(Clock(60))
 {
 }
 
@@ -66,6 +51,7 @@ void BaseState::handleUserInput()
                 break;
             }
 
+            // Key presses are broadcasted to listeners
             for (StateEventListener *listener : *inputEventListeners)
             {
                 listener->onKeyDown(keydown);
@@ -74,6 +60,7 @@ void BaseState::handleUserInput()
 
         case SDL_KEYUP:
             keyup = (*event).key.keysym.sym;
+            // Key presses are broadcasted to listeners
             for (StateEventListener *listener : *inputEventListeners)
             {
                 listener->onKeyUp(keyup);
@@ -98,12 +85,10 @@ void BaseState::activate()
 void BaseState::run()
 {
     activate();
-    FPSController fps(60);
-
     while (active)
     {
         handleUserInput();
         update();
-        fps();
+        clock.fpsControll();
     }
 }

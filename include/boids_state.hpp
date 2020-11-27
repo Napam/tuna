@@ -9,6 +9,7 @@ class Boids : public BaseState
 {
 public:
     std::vector<void*> *entities;
+    float unitPixel, unitWidth;
     Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~Boids();
     void updateGraphics();

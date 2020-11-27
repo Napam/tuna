@@ -4,6 +4,18 @@
 #include <SDL2/SDL.h>
 #include <vector>
 
+class Clock
+{
+public:
+    Uint8 targetFps;
+    float targetFrameTime;
+    float dt;
+    Uint32 prevTime;
+
+    Clock(Uint8 targetFps);
+    void fpsControll();
+};
+
 /* 
 Listener is good for handling utf8 input, dont use for charactermovment etc.
 Use for handling single key stroke stuff or something
@@ -31,6 +43,7 @@ public:
     SDL_Renderer *renderer;
     Uint32 timedelta;
     const Uint8 *keystates;
+    Clock clock;
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~BaseState();

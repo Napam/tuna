@@ -7,70 +7,59 @@
 
 using namespace Eigen;
 
-class Squareboy : public StateEventListener
+class Squareboy
 {
 public:
     SDL_Rect rect;
-    Boids *boids;
+    Boids *state;
     Array2i position;
     Array2i velocity;
-    Squareboy(Boids *boids, int x, int y, int w, int h);
+    Squareboy(Boids *state, int x, int y, int w, int h);
     void interactUser();
     void behave();
     void update();
     void blit();
     void motion();
     void setPosition(int x, int y);
-    virtual void onKeyDown(SDL_Keycode key);
-    virtual void onKeyUp(SDL_Keycode key);
 };
 
-Squareboy::Squareboy(Boids *boids, int x, int y, int w, int h)
-    : boids(boids), position(x, y), velocity(0, 0)
+Squareboy::Squareboy(Boids *state, int x, int y, int w, int h)
+    : state(state), position(x, y), velocity(0, 0)
 {
     rect = {position[0] - w / 2, position[1] - h / 2, w, h};
-    // boids->addInputEventListener(this);
-}
-
-void Squareboy::onKeyDown(SDL_Keycode key)
-{
-}
-
-void Squareboy::onKeyUp(SDL_Keycode key)
-{
 }
 
 void Squareboy::blit()
 {
-    SDL_SetRenderDrawColor(boids->renderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(boids->renderer, &rect);
+    SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(state->renderer, &rect);
 }
 
 void Squareboy::interactUser()
 {
-    const Uint8 *keys = boids->keystates;
-    
-    if (keys[SDL_SCANCODE_A]) 
+    const Uint8 *keys = state->keystates;
+
+    if (keys[SDL_SCANCODE_A])
     {
         velocity[0] -= 1;
     }
-    
-    if (keys[SDL_SCANCODE_D]) 
+
+    if (keys[SDL_SCANCODE_D])
     {
         velocity[0] += 1;
     }
-    
-    if (keys[SDL_SCANCODE_W]) 
+
+    if (keys[SDL_SCANCODE_W])
     {
         velocity[1] -= 1;
     }
-    
-    if (keys[SDL_SCANCODE_S]) 
+
+    if (keys[SDL_SCANCODE_S])
     {
         velocity[1] += 1;
     }
-    
-    if (keys[SDL_SCANCODE_SPACE]) 
+
+    if (keys[SDL_SCANCODE_SPACE])
     {
         velocity = 0;
     }
@@ -79,7 +68,7 @@ void Squareboy::interactUser()
 void Squareboy::behave()
 {
     int w, h;
-    SDL_GetWindowSize(boids->window, &w, &h);
+    SDL_GetWindowSize(state->window, &w, &h);
 
     if (position[0] + rect.w / 2 > w)
     {
@@ -127,9 +116,9 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     entities = new std::vector<void *>;
 
     // Grid of squarebois
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 5; j++)
         {
             entities->emplace_back(new Squareboy(this, 100 + i * 25, 100 + j * 25, 20, 20));
         }
@@ -176,7 +165,7 @@ What to do in one iteration in game loop, will be called by BaseState::run, no n
 manually write game loop here
 */
 void Boids::update()
-{   
+{
     interactUser();
     logic();
     updateGraphics();
