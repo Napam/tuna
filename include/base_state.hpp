@@ -7,6 +7,12 @@
 
 using namespace Eigen;
 
+/*
+Clock used for fps controll and logging time (for example for physics stuff)
+
+targetFPS: Set the target FPS the application should run in, will infer the frame time
+           from this
+*/
 class Clock
 {
 protected:
@@ -19,6 +25,12 @@ public:
     Uint32 frameTime; // Used for physics 
 
     Clock(Uint8 targetFps);
+
+    /*
+    Delays with necessary amount of milliseconds such that application runs at targetFps.
+
+    Also updates frameTime attribute, which is used to calculate timesteps in physics etc
+    */
     void fpsControll();
 };
 
@@ -29,11 +41,14 @@ Use for handling single key stroke stuff or something
 class StateEventListener
 {
 public:
-    virtual ~StateEventListener() {};
+    virtual ~StateEventListener() {}; // StackOverflow said it was good to do this
     virtual void onKeyDown(SDL_Keycode key) = 0;
     virtual void onKeyUp(SDL_Keycode key) = 0;
 };
 
+/*
+Template for states
+*/
 class BaseState
 {
 protected:
@@ -50,16 +65,43 @@ public:
     float worldDt; // "world dt = world delta time, for physics"
     const Uint8 *keystates;
     Clock clock;
-    Array2i pixelSize;
-    Array2f worldSize;
+    Array2i pixelSize; // Window size in pixels
+    Array2f worldSize; // Window size in world units
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~BaseState();
+
+    /*
+    Fills window with color, used for "clearing" the screen
+    */
     void clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
+    /*
+    Registers key strokes and broadcast to listeners, also updates keystates.
+
+    This should be run for every application iteration
+    */
     void handleUserInput();
+
+    /*
+    Setts state activate attribute to true
+    */
     void activate();
+
+    /*
+    Adds input listener to broadcast vector
+    */
     void addInputEventListener(StateEventListener *listener);
+
+
+    /*
+    Runs state, this should not be overriden. 
+    */
     void run();
+
+    /*
+    Abstract function, should implement what to do in one applicatin iteration.
+    */
     virtual void update() = 0;
 };
 
@@ -68,27 +110,95 @@ class BaseWorldObject // T should inherit BaseState template
 {
 public:
     SDL_Rect rect; // All objects are enclosed in their rects, representing their area
-    Array2f worldPosition; // Position is center point of rect
-    Array2i pixelPosition; // Position is center point of rect
+    Array2f worldPosition; // Position in world units
+    Array2i pixelPosition; // Position in pixel units
     T *state;
     BaseWorldObject(T *state, float x, float y, int w, int h);
     virtual void update() = 0;
 
-    void drawRect();
+    /*
+    Draws rectangle
+    */
+    void drawRect(); 
 
+    /*
+    Convert world units to pixel coordinates
+    */
     int worldToPixel(float unit, int dim);
+
+    /*
+    Convert world units to pixel coordinates
+    */
     Array2i worldToPixel(Array2f units);
+
+    /*
+    Comvert pixel coordinates to world units
+    */
     float pixelToWorld(int pixel, int dim);
+
+    /*
+    Comvert pixel coordinates to world units
+    */
     Array2f pixelToWorld(Array2i pixels);
 
+    /*
+    Synchronizes all attributes to world position, e.g. calculate what pixel values should be based 
+    on world attributes
+    */
     void updateWorldPosition();
+
+    /*
+    Accepts world position and synchronizes all attributes to world position, e.g. calculate what 
+    pixel values should be based on world attributes
+    */
     void updateWorldPosition(float x, float y);
+    
+    /*
+    Accepts world position and synchronizes all attributes to world position, e.g. calculate what 
+    pixel values should be based on world attributes
+    */
+    void updateWorldPosition(Array2f units);
+
+    /*
+    Sets world position attributes and synchronizes all attributes to world position, e.g. calculate 
+    what pixel values should be based on world attributes
+    */
     void updateWorldPositionX(float x);
+
+    /*
+    Sets world position attributes and synchronizes all attributes to world position, e.g. calculate 
+    what pixel values should be based on world attributes
+    */
     void updateWorldPositionY(float y);
 
+    /*
+    Synchronizes all attributes to pixel position, e.g. calculate what world values should be based 
+    on pixel attributes
+    */
     void updatePixelPosition();
+
+    /*
+    Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
+    world values should be based on pixel attributes
+    */
     void updatePixelPosition(int x, int y);
+    
+    /*
+    Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
+    world values should be based on pixel attributes
+    */
+    void updatePixelPosition(Array2i pixels);
+
+    /*
+    Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
+    world values should be based on pixel attributes
+    */
     void updatePixelPositionX(int x);
+
+    /*
+    Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
+    world values should be based on pixel attributes
+    */
     void updatePixelPositionY(int y);
 };
 
@@ -117,6 +227,7 @@ int BaseWorldObject<T>::worldToPixel(float unit, int dim)
 template <class T>
 Array2i BaseWorldObject<T>::worldToPixel(Array2f units)
 {
+    // (...).template cast is C++ syntax for calling member functions of template objects
     return ((units / state->worldSize) * state->pixelSize.template cast<float>()).template cast<int>();
 }
 
@@ -150,6 +261,13 @@ void BaseWorldObject<T>::updateWorldPosition(float x, float y)
 }
 
 template <class T>
+void BaseWorldObject<T>::updateWorldPosition(Array2f units)
+{
+    worldPosition = units;
+    updateWorldPosition();
+}
+
+template <class T>
 void BaseWorldObject<T>::updateWorldPositionX(float x)
 {
     worldPosition[0] = x;
@@ -177,6 +295,13 @@ void BaseWorldObject<T>::updatePixelPosition(int x, int y)
 {
     pixelPosition[0] = x;
     pixelPosition[1] = y;
+    updatePixelPosition();
+}
+
+template <class T>
+void BaseWorldObject<T>::updatePixelPosition(Array2i pixels)
+{
+    pixelPosition = pixels;
     updatePixelPosition();
 }
 

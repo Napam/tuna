@@ -79,7 +79,6 @@ void BaseState::handleUserInput()
 
 void BaseState::clearfill(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
-    // Fill sceen with black
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_RenderClear(renderer);
 }

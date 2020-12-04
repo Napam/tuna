@@ -8,10 +8,12 @@
 
 using namespace Eigen;
 
-class Squareboy : public BaseWorldObject<Boids>
+class Squareboy 
+    : public BaseWorldObject<Boids>
 {
 public:
-    Array2f velocity;
+    Array2f velocity, acceleration;
+    bool spacemode;
     Squareboy(Boids *state, float x, float y, int w, int h);
     void interactUser();
     void behave();
@@ -21,7 +23,7 @@ public:
 };
 
 Squareboy::Squareboy(Boids *state, float x, float y, int w, int h)
-    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0)
+    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
 {
 }
 
@@ -33,31 +35,34 @@ void Squareboy::blit()
 void Squareboy::interactUser()
 {
     const Uint8 *keys = state->keystates;
+    acceleration = 0;
 
     if (keys[SDL_SCANCODE_A])
     {
-        velocity[0] -= 1;
+        acceleration[0] -= 1;
     }
 
     if (keys[SDL_SCANCODE_D])
     {
-        velocity[0] += 1;
+        acceleration[0] += 1;
     }
 
     if (keys[SDL_SCANCODE_W])
     {
-        velocity[1] -= 1;
+        acceleration[1] -= 1;
     }
 
     if (keys[SDL_SCANCODE_S])
     {
-        velocity[1] += 1;
+        acceleration[1] += 1;
     }
 
     if (keys[SDL_SCANCODE_SPACE])
     {
-        velocity = 0;
+        acceleration *= 5;
     }
+
+    velocity += acceleration;
 }
 
 void Squareboy::behave()
@@ -82,9 +87,8 @@ void Squareboy::behave()
 
 void Squareboy::motion()
 {
-    velocity -= velocity * 0.05 * state->worldDt;
-    worldPosition = worldPosition + velocity * state->worldDt;
-    updateWorldPosition();
+    velocity -= velocity * 0.1 * state->worldDt;
+    updateWorldPosition(worldPosition + velocity * state->worldDt);
 }
 
 void Squareboy::update()
@@ -121,8 +125,6 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
         worldWidth = unitPerPixel * pixelSize[0];
     }
 
-    this->worldWidth = worldWidth;
-    this->worldHeight = worldHeight;
     this->worldSize << worldWidth, worldHeight;
 
     // Grid of squarebois

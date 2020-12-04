@@ -13,7 +13,7 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer)
     *window = SDL_CreateWindow("SDL2 Window",
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
-                               680, 480,
+                               1366, 768,
                                0);
 
     if(!(*window))
