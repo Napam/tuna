@@ -1,38 +1,33 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <vector>
+#include <cmath>
 #include "../include/base_state.hpp"
 #include "../include/boids_state.hpp"
 #include <eigen3/Eigen/Dense>
 
 using namespace Eigen;
 
-class Squareboy
+class Squareboy : public BaseWorldObject<Boids>
 {
 public:
-    SDL_Rect rect;
-    Boids *state;
-    Array2i position;
-    Array2i velocity;
-    Squareboy(Boids *state, int x, int y, int w, int h);
+    Array2f velocity;
+    Squareboy(Boids *state, float x, float y, int w, int h);
     void interactUser();
     void behave();
-    void update();
     void blit();
     void motion();
-    void setPosition(int x, int y);
+    virtual void update();
 };
 
-Squareboy::Squareboy(Boids *state, int x, int y, int w, int h)
-    : state(state), position(x, y), velocity(0, 0)
+Squareboy::Squareboy(Boids *state, float x, float y, int w, int h)
+    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0)
 {
-    rect = {position[0] - w / 2, position[1] - h / 2, w, h};
 }
 
 void Squareboy::blit()
 {
-    SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(state->renderer, &rect);
+    drawRect();
 }
 
 void Squareboy::interactUser()
@@ -67,33 +62,29 @@ void Squareboy::interactUser()
 
 void Squareboy::behave()
 {
-    int w, h;
-    SDL_GetWindowSize(state->window, &w, &h);
-
-    if (position[0] + rect.w / 2 > w)
+    if (state->pixelSize[0] < pixelPosition[0])
     {
-        position[0] = rect.w / 2;
+        updatePixelPositionX(0);
     }
-    else if (position[0] - rect.w / 2 < 0)
+    else if (pixelPosition[0] < 0)
     {
-        position[0] = w - rect.w / 2;
+        updatePixelPositionX(state->pixelSize[0]);
     }
-    else if (position[1] + rect.h / 2 > h)
+    else if (state->pixelSize[1] < pixelPosition[1])
     {
-        position[1] = rect.h / 2;
+        updatePixelPositionY(0);
     }
-    else if (position[1] - rect.h / 2 < 0)
+    else if (pixelPosition[1] < 0)
     {
-        position[1] = h - rect.h / 2;
+        updatePixelPositionY(state->pixelSize[1]);
     }
 }
 
 void Squareboy::motion()
 {
-    velocity = velocity.min(2).max(-2);
-    position = position + velocity;
-    rect.x = position[0] - rect.w / 2;
-    rect.y = position[1] - rect.h / 2;
+    velocity -= velocity * 0.05 * state->worldDt;
+    worldPosition = worldPosition + velocity * state->worldDt;
+    updateWorldPosition();
 }
 
 void Squareboy::update()
@@ -104,23 +95,42 @@ void Squareboy::update()
 }
 
 // ############################################################################################# //
-// ############################################################################################# //
-// ############################################################################################# //
-// ############################################################################################# //
-// ############################################################################################# //
-// ############################################################################################# //
 
-Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
+Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
+             float worldWidth, float worldHeight)
     : BaseState(window, renderer, event)
 {
+    float unitPerPixel;
+
     entities = new std::vector<void *>;
+
+    if ((worldHeight == -1) && (worldWidth == -1))
+    {
+        throw std::invalid_argument(
+            "worldHeight and worldWidth cannot both be -1 stoopid");
+    }
+
+    if (worldHeight == -1)
+    {
+        unitPerPixel = worldWidth / pixelSize[0];
+        worldHeight = unitPerPixel * pixelSize[1];
+    }
+    else if (worldWidth == -1)
+    {
+        unitPerPixel = worldHeight / pixelSize[1];
+        worldWidth = unitPerPixel * pixelSize[0];
+    }
+
+    this->worldWidth = worldWidth;
+    this->worldHeight = worldHeight;
+    this->worldSize << worldWidth, worldHeight;
 
     // Grid of squarebois
     for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
         {
-            entities->emplace_back(new Squareboy(this, 100 + i * 25, 100 + j * 25, 20, 20));
+            entities->emplace_back(new Squareboy(this, 100 + i * 50, 100 + j * 50, 20, 20));
         }
     }
 };

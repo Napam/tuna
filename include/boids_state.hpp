@@ -8,13 +8,15 @@
 class Boids : public BaseState
 {
 public:
-    std::vector<void*> *entities;
-    float unitPixel, unitWidth;
-    Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
+    std::vector<void *> *entities;
+    float worldWidth, worldHeight;
+    Boids(SDL_Window *window, SDL_Renderer *renderer,
+          SDL_Event *event, float worldWidth = 1000, float worldHeight = -1);
     ~Boids();
     void updateGraphics();
     void logic();
     void interactUser();
+    int worldToPixel(float x, float y);
     virtual void update();
 };
 

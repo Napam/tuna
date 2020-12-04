@@ -1,5 +1,8 @@
 #include "../include/base_state.hpp"
 #include <iostream>
+#include <eigen3/Eigen/Dense>
+
+using namespace Eigen;
 
 Clock::Clock(Uint8 targetFps)
     : targetFps(targetFps), targetFrameTime(1000 / targetFps), dt(targetFrameTime),
@@ -10,6 +13,7 @@ void Clock::fpsControll()
     dt = SDL_GetTicks() - prevTime;
     if (dt < targetFrameTime)
         SDL_Delay(targetFrameTime - dt);
+    frameTime = SDL_GetTicks() - prevTime;
     prevTime = SDL_GetTicks();
 }
 
@@ -18,6 +22,9 @@ BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *even
       inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL)),
       clock(Clock(60))
 {
+    SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
+
+    std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
 }
 
 BaseState::~BaseState()
@@ -90,5 +97,8 @@ void BaseState::run()
         handleUserInput();
         update();
         clock.fpsControll();
+        worldDt = clock.frameTime / clock.targetFrameTime;
     }
 }
+
+
