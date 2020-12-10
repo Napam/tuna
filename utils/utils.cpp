@@ -35,3 +35,4 @@ error:
     std::cout << "Some allocation failed in initialization of SDL objects\n";
     exit(-1);
 }
+

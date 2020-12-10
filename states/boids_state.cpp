@@ -4,6 +4,7 @@
 #include <cmath>
 #include "../include/base_state.hpp"
 #include "../include/boids_state.hpp"
+#include "../include/utils.hpp"
 #include <eigen3/Eigen/Dense>
 
 using namespace Eigen;
@@ -67,22 +68,10 @@ void Squareboy::interactUser()
 
 void Squareboy::behave()
 {
-    if (state->pixelSize[0] < pixelPosition[0])
-    {
-        updatePixelPositionX(0);
-    }
-    else if (pixelPosition[0] < 0)
-    {
-        updatePixelPositionX(state->pixelSize[0]);
-    }
-    else if (state->pixelSize[1] < pixelPosition[1])
-    {
-        updatePixelPositionY(0);
-    }
-    else if (pixelPosition[1] < 0)
-    {
-        updatePixelPositionY(state->pixelSize[1]);
-    }
+    if ((pixelPosition[0] < 0) || (pixelPosition[0] > state->pixelSize[0]))
+        updatePixelPositionX(pymod(pixelPosition[0], state->pixelSize[0]));
+    else if ((pixelPosition[1] < 0) || (pixelPosition[1] > state->pixelSize[1]))
+        updatePixelPositionY(pymod(pixelPosition[1], state->pixelSize[1]));
 }
 
 void Squareboy::motion()
@@ -135,6 +124,7 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
             entities->emplace_back(new Squareboy(this, 100 + i * 50, 100 + j * 50, 20, 20));
         }
     }
+    // entities->emplace_back(new Squareboy(this, 100, 100, 20, 20));
 };
 
 Boids::~Boids()

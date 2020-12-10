@@ -46,8 +46,11 @@ int main(int argc, char **argv)
     a << -4, 1, 4;
     b << 1.5, 2.2, 3.3;
     
-    std::cout << b.cast<int>() << std::endl;
+    // std::cout << b.cast<int>() << std::endl;
 
     // test();   
+    int c = -10;
+    int m = 800;
+    std::cout <<  (c % m + m) % m << std::endl;
     return 0;
 }
