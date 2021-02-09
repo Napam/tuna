@@ -1,5 +1,6 @@
 #include "../include/utils.hpp"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer)
 {
@@ -7,6 +8,12 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer)
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cout << "Failed to initialize the SDL2 library\n";
+        goto error;
+    }
+    
+    if(TTF_Init() < 0)
+    {
+        std::cout << "Failed to initialize the SDL2_TTF library\n";
         goto error;
     }
 

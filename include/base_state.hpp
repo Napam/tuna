@@ -5,8 +5,7 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
-using namespace Eigen;
-
+// using namespace Eigen;
 /*
 Clock used for fps controll and logging time (for example for physics stuff)
 
@@ -65,8 +64,8 @@ public:
     float worldDt; // "world dt = world delta time, for physics"
     const Uint8 *keystates;
     Clock clock;
-    Array2i pixelSize; // Window size in pixels
-    Array2f worldSize; // Window size in world units
+    Eigen::Array2i pixelSize; // Window size in pixels
+    Eigen::Array2f worldSize; // Window size in world units
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
     ~BaseState();
@@ -100,18 +99,21 @@ public:
     void run();
 
     /*
-    Abstract function, should implement what to do in one applicatin iteration.
+    Abstract function, should implement what to do in one application iteration.
     */
     virtual void update() = 0;
 };
 
+/*
+Template class for objects that should interact with BaseState
+*/
 template <class T>
 class BaseWorldObject // T should inherit BaseState template
 {
 public:
     SDL_Rect rect; // All objects are enclosed in their rects, representing their area
-    Array2f worldPosition; // Position in world units
-    Array2i pixelPosition; // Position in pixel units
+    Eigen::Array2f worldPosition; // Position in world units
+    Eigen::Array2i pixelPosition; // Position in pixel units
     T *state;
     BaseWorldObject(T *state, float x, float y, int w, int h);
     virtual void update() = 0;
@@ -129,7 +131,7 @@ public:
     /*
     Convert world units to pixel coordinates
     */
-    Array2i worldToPixel(Array2f units);
+    Eigen::Array2i worldToPixel(Eigen::Array2f units);
 
     /*
     Comvert pixel coordinates to world units
@@ -139,7 +141,7 @@ public:
     /*
     Comvert pixel coordinates to world units
     */
-    Array2f pixelToWorld(Array2i pixels);
+    Eigen::Array2f pixelToWorld(Eigen::Array2i pixels);
 
     /*
     Synchronizes all attributes to world position, e.g. calculate what pixel values should be based 
@@ -157,7 +159,7 @@ public:
     Accepts world position and synchronizes all attributes to world position, e.g. calculate what 
     pixel values should be based on world attributes
     */
-    void updateWorldPosition(Array2f units);
+    void updateWorldPosition(Eigen::Array2f units);
 
     /*
     Sets world position attributes and synchronizes all attributes to world position, e.g. calculate 
@@ -187,7 +189,7 @@ public:
     Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
     world values should be based on pixel attributes
     */
-    void updatePixelPosition(Array2i pixels);
+    void updatePixelPosition(Eigen::Array2i pixels);
 
     /*
     Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
@@ -225,9 +227,9 @@ int BaseWorldObject<T>::worldToPixel(float unit, int dim)
 }
 
 template <class T>
-Array2i BaseWorldObject<T>::worldToPixel(Array2f units)
+Eigen::Array2i BaseWorldObject<T>::worldToPixel(Eigen::Array2f units)
 {
-    // (...).template cast is C++ syntax for calling member functions of template objects
+    // (...).template cast<type> is C++ syntax for calling member functions of template objects
     return ((units / state->worldSize) * state->pixelSize.template cast<float>()).template cast<int>();
 }
 
@@ -238,7 +240,7 @@ float BaseWorldObject<T>::pixelToWorld(int pixel, int dim)
 }
 
 template <class T>
-Array2f BaseWorldObject<T>::pixelToWorld(Array2i pixels)
+Eigen::Array2f BaseWorldObject<T>::pixelToWorld(Eigen::Array2i pixels)
 {
     return (pixels.cast<float>() / state->pixelSize.template cast<float>()) * state->worldSize;
 }
@@ -261,7 +263,7 @@ void BaseWorldObject<T>::updateWorldPosition(float x, float y)
 }
 
 template <class T>
-void BaseWorldObject<T>::updateWorldPosition(Array2f units)
+void BaseWorldObject<T>::updateWorldPosition(Eigen::Array2f units)
 {
     worldPosition = units;
     updateWorldPosition();
@@ -299,7 +301,7 @@ void BaseWorldObject<T>::updatePixelPosition(int x, int y)
 }
 
 template <class T>
-void BaseWorldObject<T>::updatePixelPosition(Array2i pixels)
+void BaseWorldObject<T>::updatePixelPosition(Eigen::Array2i pixels)
 {
     pixelPosition = pixels;
     updatePixelPosition();

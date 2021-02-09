@@ -4,6 +4,9 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
+/*
+Assigns pointers inplace
+*/
 void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer);
 
 /*

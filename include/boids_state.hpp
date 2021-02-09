@@ -29,7 +29,7 @@ public:
     void interactUser();
     
     /*
-    Implements abastract method of BaseState
+    Implements abstract method of BaseState
     */
     virtual void update();
 };
