@@ -15,7 +15,7 @@ public:
 
 MockState::MockState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : BaseState(window, renderer, event) {
-        text = new TTFText(renderer, "Lato-Regular.ttf", 128, {255,255,255}, 0, 0, 200, 100);
+        text = new TTFText(renderer, "Lato-Regular.ttf", 128, {255,255,255}, 0, 0, 300, 100);
         text->setText("Hello, World!");
     }
 
@@ -36,5 +36,11 @@ int main(int argc, char **argv)
     MockState state(window, renderer, &event);
     state.run();
 
+    /* Free all objects*/
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
+    /* Quit program */
+    SDL_Quit();
     return 0;
 }

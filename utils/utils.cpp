@@ -26,7 +26,7 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer)
     if(!(*window))
     {
         std::cout << "Failed to create window\n";
-        goto error;
+        goto error;    
     }
 
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);

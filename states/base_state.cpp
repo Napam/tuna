@@ -6,7 +6,7 @@ using namespace Eigen;
 
 Clock::Clock(Uint8 targetFps)
     : targetFps(targetFps), targetFrameTime(1000 / targetFps), dt(targetFrameTime),
-      prevTime(SDL_GetTicks()) {}
+      prevTime(SDL_GetTicks()) {std::cout << "targetFrameTime: " << targetFrameTime << std::endl;}
 
 void Clock::fpsControll()
 {
@@ -20,7 +20,7 @@ void Clock::fpsControll()
 BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
     : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
       inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL)),
-      clock(Clock(60))
+      clock(Clock(100))
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
 
@@ -97,6 +97,8 @@ void BaseState::run()
         update();
         clock.fpsControll();
         worldDt = clock.frameTime / clock.targetFrameTime;
+        std::cout << "worldDt: " << worldDt << " ("<< clock.frameTime << "ms)"<< std::endl;
+        // SDL_Delay(20);
     }
 }
 
