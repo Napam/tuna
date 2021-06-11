@@ -4,8 +4,10 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <eigen3/Eigen/Dense>
+#include <nlohmann/json.hpp>
 
-// using namespace Eigen;
+using json = nlohmann::json;
+
 /*
 Clock used for fps controll and logging time (for example for physics stuff)
 
@@ -21,7 +23,7 @@ public:
     Uint8 targetFps;
     float targetFrameTime;
     Uint32 prevTime; // Used for delay
-    Uint32 frameTime; // Used for physics 
+    Uint32 frameTime; // Used for physics
 
     Clock(Uint8 targetFps);
 
@@ -66,8 +68,9 @@ public:
     Clock clock;
     Eigen::Array2i pixelSize; // Window size in pixels
     Eigen::Array2f worldSize; // Window size in world units
+    json &config; // Config json reader thing
 
-    BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event);
+    BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
     ~BaseState();
 
     /*

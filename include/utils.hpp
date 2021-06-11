@@ -7,7 +7,7 @@
 /*
 Assigns pointers inplace
 */
-void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer);
+void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int width, int height);
 
 /*
 Python style modulo

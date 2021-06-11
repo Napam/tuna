@@ -4,7 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 
 TTFText::TTFText(SDL_Renderer *renderer, const char* file, int ptsize, 
-                 SDL_Color color, int x, int y, int w, int h)
+                 SDL_Color color, int x, int y)
     : renderer(renderer), color(color)
 {
     font = TTF_OpenFont(file, ptsize);
@@ -13,7 +13,8 @@ TTFText::TTFText(SDL_Renderer *renderer, const char* file, int ptsize,
         exit(-1);
     }
 
-    rect = {x, y, w, h};
+    rect.x = x;
+    rect.y = y;
 }
 
 TTFText::~TTFText()
@@ -26,6 +27,9 @@ void TTFText::setText(const char *text)
 {
     surface = TTF_RenderText_Solid(font, text, color);
     texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    rect.w = surface->w;
+    rect.h = surface->h;
 }
 
 void TTFText::blit()

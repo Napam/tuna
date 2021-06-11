@@ -7,7 +7,11 @@
 #include "../include/boids_state.hpp"
 #include "../include/utils.hpp"
 #include "../include/utils.hpp"
+#include "../include/fonts.hpp"
 #include <eigen3/Eigen/Dense>
+#include <iomanip>
+
+using json = nlohmann::json;
 
 class Squareboy
     : public BaseWorldObject<BaseState>
@@ -90,12 +94,13 @@ void Squareboy::update()
 // ############################################################################################# //
 
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
-             float worldWidth, float worldHeight)
-    : BaseState(window, renderer, event)
+             json &config, float worldWidth, float worldHeight)
+    : BaseState(window, renderer, event, config)
 {
     float unitPerPixel;
 
     entities = new std::vector<void *>;
+    texts = new std::vector<void *>;
 
     if ((worldHeight == -1) && (worldWidth == -1))
     {
@@ -124,7 +129,11 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
             entities->emplace_back(new Squareboy(this, 100 + i * 50, 100 + j * 50, 20, 20));
         }
     }
-    // entities->emplace_back(new Squareboy(this, 100, 100, 20, 20));
+
+    SDL_Color color = {255, 255, 255};
+    TTFText *text;
+    text = new TTFText(renderer, "Lato-Regular.ttf", 16, color, 10, 10); 
+    texts->emplace_back(text);
 };
 
 Boids::~Boids()
@@ -134,6 +143,12 @@ Boids::~Boids()
         delete (Squareboy *)ent;
     }
     delete entities;
+    
+    for (void *text : *texts)
+    {
+        delete (TTFText *)text;
+    }
+    delete texts;
 }
 
 void Boids::updateGraphics()
@@ -144,6 +159,11 @@ void Boids::updateGraphics()
     for (void *ent : *entities)
     {
         ((Squareboy *)ent)->blit();
+    }
+    
+    for (void *text : *texts)
+    {
+        ((TTFText *)text)->blit();
     }
 
     // Flip
@@ -156,6 +176,14 @@ void Boids::logic()
     {
         ((Squareboy *)ent)->update();
     }
+
+    // FPS Text
+    TTFText *text = (TTFText*)texts->front();
+    std::stringstream ss;
+    ss << "Frametime (ms): " << clock.frameTime;
+    const std::string &tmp = ss.str();
+    const char *cstr = tmp.c_str();
+    text->setText(cstr);
 }
 
 void Boids::interactUser()

@@ -1,8 +1,10 @@
 #include "../include/base_state.hpp"
 #include <iostream>
 #include <eigen3/Eigen/Dense>
+#include <nlohmann/json.hpp>
 
 using namespace Eigen;
+using json = nlohmann::json;
 
 Clock::Clock(Uint8 targetFps)
     : targetFps(targetFps), targetFrameTime(1000 / targetFps), dt(targetFrameTime),
@@ -17,13 +19,12 @@ void Clock::fpsControll()
     prevTime = SDL_GetTicks();
 }
 
-BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event)
+BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config)
     : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
       inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL)),
-      clock(Clock(100))
+      config(config), clock(Clock(config["targetFps"].get<int>()))
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
-
     std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
 }
 
@@ -97,9 +98,7 @@ void BaseState::run()
         update();
         clock.fpsControll();
         worldDt = clock.frameTime / clock.targetFrameTime;
-        std::cout << "worldDt: " << worldDt << " ("<< clock.frameTime << "ms)"<< std::endl;
+        // std::cout << "worldDt: " << worldDt << " ("<< clock.frameTime << "ms)"<< std::endl;
         // SDL_Delay(20);
     }
 }
-
-

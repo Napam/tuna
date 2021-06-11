@@ -4,13 +4,17 @@
 #include <SDL2/SDL.h>
 #include "../include/base_state.hpp"
 #include <vector>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class Boids : public BaseState
 {
 public:
     std::vector<void *> *entities; // Stores game entities
+    std::vector<void *> *texts; // Stores text stuff
     Boids(SDL_Window *window, SDL_Renderer *renderer,
-          SDL_Event *event, float worldWidth = 2000, float worldHeight = -1);
+          SDL_Event *event, json &config, float worldWidth = 2000, float worldHeight = -1);
     ~Boids();
 
     /*
