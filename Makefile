@@ -1,8 +1,8 @@
-CPPC = g++
+CPPC = g++ 
 OUT_FILE = boids.out
 COMPILER_FLAGS = -o $(OUT_FILE)
 MAIN_FILE = main.cpp
-LINKS = -lSDL2 -lSDL2_ttf
+LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx
 
 HEADERS = include/utils.hpp \
 		  include/fonts.hpp \

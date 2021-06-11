@@ -2,6 +2,7 @@
 #define BASE_STATE_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <nlohmann/json.hpp>
@@ -125,6 +126,11 @@ public:
     Draws rectangle
     */
     void drawRect(); 
+    
+    /*
+    Draws circle
+    */
+    void drawCircle(Sint16 rad); 
 
     /*
     Convert world units to pixel coordinates
@@ -220,7 +226,15 @@ template <class T>
 void BaseWorldObject<T>::drawRect()
 {
     SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(state->renderer, &rect);
+    SDL_Rect temp = {rect.x - rect.w/2, rect.y-rect.h/2, rect.w, rect.h};
+    SDL_RenderDrawRect(state->renderer, &temp);
+}
+
+template <class T>
+void BaseWorldObject<T>::drawCircle(Sint16 rad)
+{
+    SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
+    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 255, 255, 255, 255);
 }
 
 template <class T>

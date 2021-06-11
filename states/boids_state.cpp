@@ -35,6 +35,7 @@ Squareboy::Squareboy(BaseState *state, float x, float y, int w, int h)
 void Squareboy::blit()
 {
     drawRect();
+    drawCircle(state->config["debug"]["circleRadius"]);
 }
 
 void Squareboy::interactUser()

@@ -4,11 +4,18 @@
 
 using json = nlohmann::json;
 
+typedef struct test {
+    int x, y;
+} WOA;
+
+void printTest(WOA *a)
+{
+    std::cout << (*a).x << " " << (*a).y << "\n"; 
+}
+
 int main(int argc, char **argv)
 {
-    std::ifstream stream("config.json");
-    json j3 = json::parse(stream);
-    std::cout << j3["pi"].get<float>() << "\n";
-    std::cout << j3["window"]["width"].get<float>() << "\n";
+    auto hehe = WOA({1,2});
+    printTest(&WOA({1,2}));
     return 0;
 }
