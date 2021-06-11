@@ -21,12 +21,12 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int w
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
                                width, height,
-                               0);
+                               SDL_WINDOW_ALLOW_HIGHDPI);
 
     if(!(*window))
     {
         std::cout << "Failed to create window\n";
-        goto error;    
+        goto error;
     }
 
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);

@@ -1,5 +1,17 @@
  {
-     "targetFps":120,
-     "window":{"width":1600, "height": 800},
-     "debug":{"circleRadius":10}
+    "targetFps":60,
+    "window":{"width":1600, "height": 800},
+    "debug":{
+        "circleRadius":4
+    },
+    "boids":{
+        "fpsMonitor":{
+            "use":true,
+            "ptsize":16,
+            "x":0.01,
+            "y":0.96,
+            "color":[255,255,255,255],
+            "fontFile": "Lato-Regular.tff"
+        }
+    }
  }

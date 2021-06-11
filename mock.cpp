@@ -4,18 +4,11 @@
 
 using json = nlohmann::json;
 
-typedef struct test {
-    int x, y;
-} WOA;
-
-void printTest(WOA *a)
-{
-    std::cout << (*a).x << " " << (*a).y << "\n"; 
-}
-
 int main(int argc, char **argv)
 {
-    auto hehe = WOA({1,2});
-    printTest(&WOA({1,2}));
+    std::ifstream stream("config.json");
+    json j3 = json::parse(stream);
+    std::cout << j3["boids"]["fpsMonitor"]["fontFile"] << "\n";
+    std::cout << j3["boids"]["fpsMonitor"]["color"][0].get<int>() << "\n";
     return 0;
 }

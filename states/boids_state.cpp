@@ -45,27 +45,37 @@ void Squareboy::interactUser()
 
     if (keys[SDL_SCANCODE_A])
     {
-        acceleration[0] -= 1;
+        acceleration[0] -= 2;
     }
 
     if (keys[SDL_SCANCODE_D])
     {
-        acceleration[0] += 1;
+        acceleration[0] += 2;
     }
 
     if (keys[SDL_SCANCODE_W])
     {
-        acceleration[1] -= 1;
+        acceleration[1] -= 2;
     }
 
     if (keys[SDL_SCANCODE_S])
     {
-        acceleration[1] += 1;
+        acceleration[1] += 2;
     }
 
     if (keys[SDL_SCANCODE_SPACE])
     {
-        acceleration *= 5;
+        acceleration *= 6;
+    }
+    
+    if (keys[SDL_SCANCODE_LSHIFT])
+    {
+        acceleration /= 6;
+    }
+
+    if (keys[SDL_SCANCODE_C])
+    {
+        velocity -= velocity * 0.1 * state->worldDt;
     }
 
     velocity += acceleration * state->worldDt;
@@ -81,7 +91,7 @@ void Squareboy::behave()
 
 void Squareboy::motion()
 {
-    velocity -= velocity * 0.1 * state->worldDt;
+    velocity -= velocity * 0.05 * state->worldDt;
     updateWorldPosition(worldPosition + velocity * state->worldDt);
 }
 
@@ -94,6 +104,12 @@ void Squareboy::update()
 
 // ############################################################################################# //
 
+class FpsCounter : public TTFText
+{
+    Uint32 prevTime, updateRate;
+    FpsCounter();
+};
+
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
              json &config, float worldWidth, float worldHeight)
     : BaseState(window, renderer, event, config)
@@ -102,6 +118,8 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
 
     entities = new std::vector<void *>;
     texts = new std::vector<void *>;
+
+    this->addInputEventListener(this);
 
     if ((worldHeight == -1) && (worldWidth == -1))
     {
@@ -131,10 +149,25 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
         }
     }
 
-    SDL_Color color = {255, 255, 255};
-    TTFText *text;
-    text = new TTFText(renderer, "Lato-Regular.ttf", 16, color, 10, 10); 
-    texts->emplace_back(text);
+    auto fpsMonitorJson = config["boids"]["fpsMonitor"];
+    if (fpsMonitorJson["use"].get<bool>()) {
+        SDL_Color color = {
+            fpsMonitorJson["color"][0].get<Uint8>(),
+            fpsMonitorJson["color"][1].get<Uint8>(),
+            fpsMonitorJson["color"][2].get<Uint8>()
+        };
+
+        TTFText *text;
+        text = new TTFText(
+            renderer, 
+            "Lato-Regular.ttf", 
+            fpsMonitorJson["ptsize"].get<Uint8>(), 
+            color,
+            fpsMonitorJson["x"].get<double>(),
+            fpsMonitorJson["y"].get<double>()
+        ); 
+        texts->emplace_back(text);
+    }
 };
 
 Boids::~Boids()
@@ -149,6 +182,7 @@ Boids::~Boids()
     {
         delete (TTFText *)text;
     }
+
     delete texts;
 }
 
@@ -181,14 +215,30 @@ void Boids::logic()
     // FPS Text
     TTFText *text = (TTFText*)texts->front();
     std::stringstream ss;
-    ss << "Frametime (ms): " << clock.frameTime;
+    // Avoid divison by zero
+    ss << "FPS: " << int(1000 / (clock.frameTime + 0.001));
     const std::string &tmp = ss.str();
     const char *cstr = tmp.c_str();
     text->setText(cstr);
 }
 
-void Boids::interactUser()
-{
+void Boids::onMouseDown(Uint8 button) {
+    if (button == SDL_BUTTON_LEFT)
+        std::cout << "Left button pressed down" << "\n";
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        entities->emplace_back(new Squareboy(this, x, y, 20, 20));
+        
+    if (button == SDL_BUTTON_RIGHT)
+        std::cout << "Right button pressed down" << "\n";
+}
+
+void Boids::onMouseUp(Uint8 button) {
+    std::cout << "UP!! " << button << "\n";
+    if (button == SDL_BUTTON_LEFT)
+        std::cout << "Left button relased" << "\n";
+    if (button == SDL_BUTTON_RIGHT)
+        std::cout << "Right button released" << "\n";
 }
 
 /*
@@ -197,7 +247,6 @@ manually write game loop here
 */
 void Boids::update()
 {
-    interactUser();
     logic();
     updateGraphics();
 }

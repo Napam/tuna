@@ -46,6 +46,8 @@ public:
     virtual ~StateEventListener() {}; // StackOverflow said it was good to do this
     virtual void onKeyDown(SDL_Keycode key) = 0;
     virtual void onKeyUp(SDL_Keycode key) = 0;
+    virtual void onMouseDown(Uint8 button) = 0;
+    virtual void onMouseUp(Uint8 button) = 0;
 };
 
 /*
@@ -60,8 +62,10 @@ public:
     bool active;
     bool eventHappened;
     SDL_Event *event;
-    SDL_Keycode keydown;
-    SDL_Keycode keyup;
+    SDL_Keycode keyDown;
+    SDL_Keycode keyUp;
+    Uint8 mouseDown;
+    Uint8 mouseUp;
     SDL_Window *window;
     SDL_Renderer *renderer;
     float worldDt; // "world dt = world delta time, for physics"
@@ -225,7 +229,7 @@ BaseWorldObject<T>::BaseWorldObject(T *state, float x, float y, int w, int h)
 template <class T>
 void BaseWorldObject<T>::drawRect()
 {
-    SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(state->renderer, 20, 255, 10, 255);
     SDL_Rect temp = {rect.x - rect.w/2, rect.y-rect.h/2, rect.w, rect.h};
     SDL_RenderDrawRect(state->renderer, &temp);
 }
@@ -233,8 +237,7 @@ void BaseWorldObject<T>::drawRect()
 template <class T>
 void BaseWorldObject<T>::drawCircle(Sint16 rad)
 {
-    SDL_SetRenderDrawColor(state->renderer, 255, 255, 255, 255);
-    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 255, 255, 255, 255);
+    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 20, 255, 10, 255);
 }
 
 template <class T>

@@ -8,11 +8,12 @@
 
 using json = nlohmann::json;
 
-class Boids : public BaseState
+class Boids : public BaseState, public StateEventListener
 {
 public:
     std::vector<void *> *entities; // Stores game entities
     std::vector<void *> *texts; // Stores text stuff
+    
     Boids(SDL_Window *window, SDL_Renderer *renderer,
           SDL_Event *event, json &config, float worldWidth = 2000, float worldHeight = -1);
     ~Boids();
@@ -27,10 +28,10 @@ public:
     */
     void logic();
 
-    /*
-    State interaction with user
-    */
-    void interactUser();
+    void onKeyDown(SDL_Keycode key) {};
+    void onKeyUp(SDL_Keycode key) {};
+    void onMouseDown(Uint8 button);
+    void onMouseUp(Uint8 button);
     
     /*
     Implements abstract method of BaseState

@@ -25,6 +25,7 @@ BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *even
       config(config), clock(Clock(config["targetFps"].get<int>()))
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
+    inputEventListeners = new std::vector<StateEventListener *>;
     std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
 }
 
@@ -50,8 +51,8 @@ void BaseState::handleUserInput()
             break;
 
         case SDL_KEYDOWN:
-            keydown = (*event).key.keysym.sym;
-            switch (keydown)
+            keyDown = (*event).key.keysym.sym;
+            switch (keyDown)
             {
             case SDLK_F4:
                 if ((*event).key.keysym.mod == SDLK_LALT)
@@ -62,16 +63,32 @@ void BaseState::handleUserInput()
             // Key presses are broadcasted to listeners
             for (StateEventListener *listener : *inputEventListeners)
             {
-                listener->onKeyDown(keydown);
+                listener->onKeyDown(keyDown);
             }
             break;
 
         case SDL_KEYUP:
-            keyup = (*event).key.keysym.sym;
+            keyUp = (*event).key.keysym.sym;
             // Key presses are broadcasted to listeners
             for (StateEventListener *listener : *inputEventListeners)
             {
-                listener->onKeyUp(keyup);
+                listener->onKeyUp(keyUp);
+            }
+            break;
+        
+        case SDL_MOUSEBUTTONDOWN:
+            mouseDown = (*event).button.button;
+            for (StateEventListener *listener : *inputEventListeners)
+            {
+                listener->onMouseDown(mouseDown);
+            }
+            break;
+        
+        case SDL_MOUSEBUTTONUP:
+            mouseDown = (*event).button.button;
+            for (StateEventListener *listener : *inputEventListeners)
+            {
+                listener->onMouseUp(mouseUp);
             }
             break;
         }

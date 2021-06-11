@@ -18,6 +18,8 @@ public:
     SDL_Rect rect;
     TTFText(SDL_Renderer *renderer, const char *file, int ptsize, 
             SDL_Color color, int x, int y);
+    TTFText(SDL_Renderer *renderer, const char *file, int ptsize, 
+            SDL_Color color, double x, double y);
     ~TTFText();
     void setText(const char *text);
     void blit();

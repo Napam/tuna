@@ -17,6 +17,23 @@ TTFText::TTFText(SDL_Renderer *renderer, const char* file, int ptsize,
     rect.y = y;
 }
 
+TTFText::TTFText(SDL_Renderer *renderer, const char* file, int ptsize, 
+                 SDL_Color color, double x, double y)
+    : renderer(renderer), color(color)
+{
+    font = TTF_OpenFont(file, ptsize);
+    if (!font) {
+        std::cout << "Could not open font: " << file << std::endl;
+        exit(-1);
+    }
+
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+
+    rect.x = int(x * w);
+    rect.y = int(y * h);
+}
+
 TTFText::~TTFText()
 {
     SDL_FreeSurface(surface);
