@@ -110,11 +110,33 @@ void Squareboy::update()
 
 // ############################################################################################# //
 
-class FpsCounter : public TTFText
+class FpsCounter : public TTFText, public BaseWorldObject<BaseState>
 {
     Uint32 prevTime, updateRate;
-    FpsCounter();
+    FpsCounter(BaseState *state);
+    void update();
 };
+
+// FpsCounter::FpsCounter(BaseState *state) 
+//     : TTFText()
+// {
+//     auto fpsJson = state->config["boids"]["fpsMonitor"];
+
+//     SDL_Color color = {
+//         fpsJson["color"][0].get<Uint8>(),
+//         fpsJson["color"][1].get<Uint8>(),
+//         fpsJson["color"][2].get<Uint8>()
+//     };
+
+//     TTFText(
+//         renderer, 
+//         fpsJson["fontFile"].get<std::string>().c_str(), 
+//         fpsJson["ptsize"].get<Uint8>(), 
+//         color,
+//         fpsJson["x"].get<double>(),
+//         fpsJson["y"].get<double>()
+//     ); 
+// }
 
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
              json &config, float worldWidth, float worldHeight)
@@ -154,8 +176,6 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
             entities->emplace_back(new Squareboy(this, 100 + i * 50, 100 + j * 50, 20, 20));
         }
     }
-
-    entities->emplace_back(new Squareboy(this, 1600, 800, 20, 20));
 
     auto fpsMonitorJson = config["boids"]["fpsMonitor"];
     if (fpsMonitorJson["use"].get<bool>()) {
@@ -217,7 +237,7 @@ void Boids::logic()
 {
     for (void *ent : *entities)
     {
-        ((Squareboy *)ent)->update();
+        ((BaseWorldObject<BaseState> *)ent)->update();
     }
 
     // FPS Text
@@ -231,13 +251,13 @@ void Boids::logic()
 }
 
 void Boids::onMouseDown(Uint8 button) {
-    if (button == SDL_BUTTON_LEFT)
+    if (button == SDL_BUTTON_LEFT) {
         int x, y;
         SDL_GetMouseState(&x, &y);
         entities->emplace_back(new Squareboy(this, x, y, 20, 20));
+    }
         
-    if (button == SDL_BUTTON_RIGHT)
-        std::cout << "Right button pressed down" << "\n";
+    if (button == SDL_BUTTON_RIGHT) {}
 }
 
 void Boids::onMouseUp(Uint8 button) {
