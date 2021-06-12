@@ -123,7 +123,8 @@ public:
     Eigen::Array2f worldPosition; // Position in world units
     Eigen::Array2i pixelPosition; // Position in pixel units
     T *state;
-    BaseWorldObject(T *state, float x, float y, int w, int h);
+    BaseWorldObject(T *state, float x, float y, int w, int h); // Initialize with world coordinates
+    BaseWorldObject(T *state, int x, int y, int w, int h); // Initialize with pixel coordinates
     virtual void update() = 0;
 
     /*
@@ -224,6 +225,17 @@ BaseWorldObject<T>::BaseWorldObject(T *state, float x, float y, int w, int h)
     rect.w = w;
     rect.h = h;
     updateWorldPosition();
+}
+
+template <class T>
+BaseWorldObject<T>::BaseWorldObject(T *state, int x, int y, int w, int h)
+    : state(state), pixelPosition(x, y)
+{
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+    updatePixelPosition();
 }
 
 template <class T>

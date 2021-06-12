@@ -20,6 +20,7 @@ public:
     Eigen::Array2f velocity, acceleration;
     bool spacemode;
     Squareboy(BaseState *state, float x, float y, int w, int h);
+    Squareboy(BaseState *state, int x, int y, int w, int h);
     void interactUser();
     void behave();
     void blit();
@@ -28,6 +29,11 @@ public:
 };
 
 Squareboy::Squareboy(BaseState *state, float x, float y, int w, int h)
+    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
+{
+}
+
+Squareboy::Squareboy(BaseState *state, int x, int y, int w, int h)
     : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
 {
 }
@@ -149,6 +155,8 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
         }
     }
 
+    entities->emplace_back(new Squareboy(this, 1600, 800, 20, 20));
+
     auto fpsMonitorJson = config["boids"]["fpsMonitor"];
     if (fpsMonitorJson["use"].get<bool>()) {
         SDL_Color color = {
@@ -224,7 +232,6 @@ void Boids::logic()
 
 void Boids::onMouseDown(Uint8 button) {
     if (button == SDL_BUTTON_LEFT)
-        std::cout << "Left button pressed down" << "\n";
         int x, y;
         SDL_GetMouseState(&x, &y);
         entities->emplace_back(new Squareboy(this, x, y, 20, 20));
@@ -234,11 +241,8 @@ void Boids::onMouseDown(Uint8 button) {
 }
 
 void Boids::onMouseUp(Uint8 button) {
-    std::cout << "UP!! " << button << "\n";
-    if (button == SDL_BUTTON_LEFT)
-        std::cout << "Left button relased" << "\n";
-    if (button == SDL_BUTTON_RIGHT)
-        std::cout << "Right button released" << "\n";
+    if (button == SDL_BUTTON_LEFT) {}
+    if (button == SDL_BUTTON_RIGHT) {}
 }
 
 /*

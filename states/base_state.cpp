@@ -85,7 +85,7 @@ void BaseState::handleUserInput()
             break;
         
         case SDL_MOUSEBUTTONUP:
-            mouseDown = (*event).button.button;
+            mouseUp = (*event).button.button;
             for (StateEventListener *listener : *inputEventListeners)
             {
                 listener->onMouseUp(mouseUp);

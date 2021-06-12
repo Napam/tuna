@@ -21,7 +21,7 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int w
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
                                width, height,
-                               SDL_WINDOW_ALLOW_HIGHDPI);
+                               0);
 
     if(!(*window))
     {
