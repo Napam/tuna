@@ -10,8 +10,8 @@
             "ptsize":16,
             "x":0.01,
             "y":0.96,
-            "color":[255,255,255,255],
-            "fontFile": "Lato-Regular.tff"
+            "color":[255, 255, 255, 255],
+            "fontFile": "Lato-Regular.ttf"
         }
     }
  }

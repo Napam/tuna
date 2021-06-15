@@ -12,7 +12,6 @@ class Boids : public BaseState, public StateEventListener
 {
 public:
     std::vector<void *> *entities; // Stores game entities
-    std::vector<void *> *texts; // Stores text stuff
     
     Boids(SDL_Window *window, SDL_Renderer *renderer,
           SDL_Event *event, json &config, float worldWidth = 2000, float worldHeight = -1);

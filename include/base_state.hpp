@@ -125,6 +125,12 @@ public:
     T *state;
     BaseWorldObject(T *state, float x, float y, int w, int h); // Initialize with world coordinates
     BaseWorldObject(T *state, int x, int y, int w, int h); // Initialize with pixel coordinates
+
+    /*
+     * Initializes rect to zero vector
+     */
+    BaseWorldObject(T *state);
+    
     virtual void update() = 0;
 
     /*
@@ -216,26 +222,36 @@ public:
     world values should be based on pixel attributes
     */
     void updatePixelPositionY(int y);
+
+    virtual void blit() = 0;
 };
 
 template <class T>
 BaseWorldObject<T>::BaseWorldObject(T *state, float x, float y, int w, int h)
-    : state(state), worldPosition(x, y)
+    : state(state)
 {
     rect.w = w;
     rect.h = h;
-    updateWorldPosition();
+    updateWorldPosition(w, h);
 }
+
 
 template <class T>
 BaseWorldObject<T>::BaseWorldObject(T *state, int x, int y, int w, int h)
-    : state(state), pixelPosition(x, y)
+    : state(state)
 {
-    rect.x = x;
-    rect.y = y;
     rect.w = w;
     rect.h = h;
-    updatePixelPosition();
+    updatePixelPosition(x, y);
+}
+
+template <class T>
+BaseWorldObject<T>::BaseWorldObject(T *state)
+    : state(state)
+{
+    rect.w = 0;
+    rect.h = 0;
+    updateWorldPosition(0,0);
 }
 
 template <class T>

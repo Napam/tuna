@@ -4,25 +4,29 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
+#include "../include/base_state.hpp"
 
-class TTFText
+using json = nlohmann::json;
+
+class TTFText : public BaseWorldObject<BaseState>
 {
 protected:
     SDL_Surface *surface;
     SDL_Texture *texture;
 
 public:
-    SDL_Renderer *renderer;
     TTF_Font *font;
     SDL_Color color;
-    SDL_Rect rect;
-    TTFText(SDL_Renderer *renderer, const char *file, int ptsize, 
+    TTFText(BaseState *state, const char *file, int ptsize, 
             SDL_Color color, int x, int y);
-    TTFText(SDL_Renderer *renderer, const char *file, int ptsize, 
-            SDL_Color color, double x, double y);
+    TTFText(BaseState *state, const char *file, int ptsize, 
+            SDL_Color color, float x, float y);
+    TTFText(BaseState *state, json &j);
     ~TTFText();
     void setText(const char *text);
-    void blit();
+    virtual void blit();
+    void update();
 };
 
 #endif

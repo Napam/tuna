@@ -110,33 +110,32 @@ void Squareboy::update()
 
 // ############################################################################################# //
 
-class FpsCounter : public TTFText, public BaseWorldObject<BaseState>
+class FpsCounter : public TTFText
 {
+public:
     Uint32 prevTime, updateRate;
     FpsCounter(BaseState *state);
-    void update();
+    virtual void update();
 };
 
-// FpsCounter::FpsCounter(BaseState *state) 
-//     : TTFText()
-// {
-//     auto fpsJson = state->config["boids"]["fpsMonitor"];
+FpsCounter::FpsCounter(BaseState *state) 
+    : TTFText(state, state->config["boids"]["fpsMonitor"]), prevTime(SDL_GetTicks()), updateRate(250)
+{
+}
 
-//     SDL_Color color = {
-//         fpsJson["color"][0].get<Uint8>(),
-//         fpsJson["color"][1].get<Uint8>(),
-//         fpsJson["color"][2].get<Uint8>()
-//     };
-
-//     TTFText(
-//         renderer, 
-//         fpsJson["fontFile"].get<std::string>().c_str(), 
-//         fpsJson["ptsize"].get<Uint8>(), 
-//         color,
-//         fpsJson["x"].get<double>(),
-//         fpsJson["y"].get<double>()
-//     ); 
-// }
+void FpsCounter::update() 
+{
+    if ((SDL_GetTicks() - prevTime) > updateRate) {
+        std::stringstream ss;
+        // Avoid divison by zero
+        ss << "FPS: " << int(1000 / (state->clock.frameTime + 0.001));
+        const std::string &tmp = ss.str();
+        const char *cstr = tmp.c_str();
+        this->setText(cstr);
+        prevTime = SDL_GetTicks();
+    }
+    // std::cout << "Updating FpsCounter: " << cstr << "\n";
+}
 
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
              json &config, float worldWidth, float worldHeight)
@@ -145,7 +144,6 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
     float unitPerPixel;
 
     entities = new std::vector<void *>;
-    texts = new std::vector<void *>;
 
     this->addInputEventListener(this);
 
@@ -177,41 +175,16 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
         }
     }
 
-    auto fpsMonitorJson = config["boids"]["fpsMonitor"];
-    if (fpsMonitorJson["use"].get<bool>()) {
-        SDL_Color color = {
-            fpsMonitorJson["color"][0].get<Uint8>(),
-            fpsMonitorJson["color"][1].get<Uint8>(),
-            fpsMonitorJson["color"][2].get<Uint8>()
-        };
-
-        TTFText *text;
-        text = new TTFText(
-            renderer, 
-            "Lato-Regular.ttf", 
-            fpsMonitorJson["ptsize"].get<Uint8>(), 
-            color,
-            fpsMonitorJson["x"].get<double>(),
-            fpsMonitorJson["y"].get<double>()
-        ); 
-        texts->emplace_back(text);
-    }
+    entities->emplace_back(new FpsCounter(this));
 };
 
 Boids::~Boids()
 {
     for (void *ent : *entities)
     {
-        delete (Squareboy *)ent;
+        delete (BaseWorldObject<BaseState> *)ent;
     }
     delete entities;
-    
-    for (void *text : *texts)
-    {
-        delete (TTFText *)text;
-    }
-
-    delete texts;
 }
 
 void Boids::updateGraphics()
@@ -221,12 +194,7 @@ void Boids::updateGraphics()
 
     for (void *ent : *entities)
     {
-        ((Squareboy *)ent)->blit();
-    }
-    
-    for (void *text : *texts)
-    {
-        ((TTFText *)text)->blit();
+        ((BaseWorldObject<BaseState> *)ent)->blit();
     }
 
     // Flip
@@ -239,15 +207,6 @@ void Boids::logic()
     {
         ((BaseWorldObject<BaseState> *)ent)->update();
     }
-
-    // FPS Text
-    TTFText *text = (TTFText*)texts->front();
-    std::stringstream ss;
-    // Avoid divison by zero
-    ss << "FPS: " << int(1000 / (clock.frameTime + 0.001));
-    const std::string &tmp = ss.str();
-    const char *cstr = tmp.c_str();
-    text->setText(cstr);
 }
 
 void Boids::onMouseDown(Uint8 button) {
