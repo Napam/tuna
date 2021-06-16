@@ -119,3 +119,149 @@ void BaseState::run()
         // SDL_Delay(20);
     }
 }
+
+BaseWorldObject::BaseWorldObject(BaseState *state, float x, float y, int w, int h)
+    : state(state)
+{
+    rect.w = w;
+    rect.h = h;
+    updateWorldPosition(w, h);
+}
+
+
+
+BaseWorldObject::BaseWorldObject(BaseState *state, int x, int y, int w, int h)
+    : state(state)
+{
+    rect.w = w;
+    rect.h = h;
+    updatePixelPosition(x, y);
+}
+
+
+BaseWorldObject::BaseWorldObject(BaseState *state)
+    : state(state)
+{
+    rect.w = 0;
+    rect.h = 0;
+    updateWorldPosition(0,0);
+}
+
+
+void BaseWorldObject::drawRect()
+{
+    SDL_SetRenderDrawColor(state->renderer, 20, 255, 10, 255);
+    SDL_Rect temp = {rect.x - rect.w/2, rect.y-rect.h/2, rect.w, rect.h};
+    SDL_RenderDrawRect(state->renderer, &temp);
+}
+
+
+void BaseWorldObject::drawCircle(Sint16 rad)
+{
+    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 20, 255, 10, 255);
+}
+
+
+int BaseWorldObject::worldToPixel(float unit, int dim)
+{
+    return static_cast<int>((unit / state->worldSize[dim]) * state->pixelSize[dim]);
+}
+
+
+Eigen::Array2i BaseWorldObject::worldToPixel(Eigen::Array2f units)
+{
+    // (...).template cast<type> is C++ syntax for calling member functions of template objects
+    // ^ Artifact from old code, but I leave it here since it may be useful info
+
+    // Must explicitly cast stuff, or eigen will complain
+    return ((units / state->worldSize) * state->pixelSize.cast<float>()).cast<int>();
+}
+
+
+float BaseWorldObject::pixelToWorld(int pixel, int dim)
+{
+    return (static_cast<float>(pixel) / state->pixelSize[dim]) * state->worldSize[dim];
+}
+
+
+Eigen::Array2f BaseWorldObject::pixelToWorld(Eigen::Array2i pixels)
+{
+    // Must explicitly cast stuff, or eigen will complain
+    return ((pixels.cast<float>() / state->pixelSize.cast<float>()) * state->worldSize).cast<float>();
+}
+
+
+void BaseWorldObject::updateWorldPosition()
+{    
+    pixelPosition = worldToPixel(worldPosition);
+
+    rect.x = pixelPosition[0];
+    rect.y = pixelPosition[1];
+}
+
+
+void BaseWorldObject::updateWorldPosition(float x, float y)
+{
+    worldPosition[0] = x;
+    worldPosition[1] = y;
+    updateWorldPosition();
+}
+
+
+void BaseWorldObject::updateWorldPosition(Eigen::Array2f units)
+{
+    worldPosition = units;
+    updateWorldPosition();
+}
+
+
+void BaseWorldObject::updateWorldPositionX(float x)
+{
+    worldPosition[0] = x;
+    updateWorldPosition();
+}
+
+
+void BaseWorldObject::updateWorldPositionY(float y)
+{
+    worldPosition[1] = y;
+    updateWorldPosition();
+}
+
+
+void BaseWorldObject::updatePixelPosition()
+{
+    worldPosition = pixelToWorld(pixelPosition);
+
+    rect.x = pixelPosition[0];
+    rect.y = pixelPosition[1];
+}
+
+
+void BaseWorldObject::updatePixelPosition(int x, int y)
+{
+    pixelPosition[0] = x;
+    pixelPosition[1] = y;
+    updatePixelPosition();
+}
+
+
+void BaseWorldObject::updatePixelPosition(Eigen::Array2i pixels)
+{
+    pixelPosition = pixels;
+    updatePixelPosition();
+}
+
+
+void BaseWorldObject::updatePixelPositionX(int x)
+{
+    pixelPosition[0] = x;
+    updatePixelPosition();
+}
+
+
+void BaseWorldObject::updatePixelPositionY(int y)
+{
+    pixelPosition[1] = y;
+    updatePixelPosition();
+}

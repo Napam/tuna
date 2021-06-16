@@ -14,7 +14,7 @@
 using json = nlohmann::json;
 
 class Squareboy
-    : public BaseWorldObject<BaseState>
+    : public BaseWorldObject
 {
 public:
     Eigen::Array2f velocity, acceleration;
@@ -181,7 +181,7 @@ Boids::~Boids()
 {
     for (void *ent : *entities)
     {
-        delete (BaseWorldObject<BaseState> *)ent;
+        delete (BaseWorldObject *)ent;
     }
     delete entities;
 }
@@ -193,7 +193,7 @@ void Boids::updateGraphics()
 
     for (void *ent : *entities)
     {
-        ((BaseWorldObject<BaseState> *)ent)->blit();
+        ((BaseWorldObject *)ent)->blit();
     }
 
     // Flip
@@ -204,7 +204,7 @@ void Boids::logic()
 {
     for (void *ent : *entities)
     {
-        ((BaseWorldObject<BaseState> *)ent)->update();
+        ((BaseWorldObject *)ent)->update();
     }
 }
 

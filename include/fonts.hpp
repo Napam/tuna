@@ -9,7 +9,7 @@
 
 using json = nlohmann::json;
 
-class TTFText : public BaseWorldObject<BaseState>
+class TTFText : public BaseWorldObject
 {
 protected:
     SDL_Surface *surface;

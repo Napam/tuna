@@ -115,21 +115,20 @@ public:
 /*
 Template class for objects that should interact with BaseState
 */
-template <class T>
 class BaseWorldObject // T should inherit BaseState template
 {
 public:
     SDL_Rect rect; // All objects are enclosed in their rects, representing their area
     Eigen::Array2f worldPosition; // Position in world units
     Eigen::Array2i pixelPosition; // Position in pixel units
-    T *state;
-    BaseWorldObject(T *state, float x, float y, int w, int h); // Initialize with world coordinates
-    BaseWorldObject(T *state, int x, int y, int w, int h); // Initialize with pixel coordinates
+    BaseState *state;
+    BaseWorldObject(BaseState *state, float x, float y, int w, int h); // Initialize with world coordinates
+    BaseWorldObject(BaseState *state, int x, int y, int w, int h); // Initialize with pixel coordinates
 
     /*
      * Initializes rect to zero vector
      */
-    BaseWorldObject(T *state);
+    BaseWorldObject(BaseState *state);
     
     virtual void update() = 0;
 
@@ -225,148 +224,5 @@ public:
 
     virtual void blit() = 0;
 };
-
-template <class T>
-BaseWorldObject<T>::BaseWorldObject(T *state, float x, float y, int w, int h)
-    : state(state)
-{
-    rect.w = w;
-    rect.h = h;
-    updateWorldPosition(w, h);
-}
-
-
-template <class T>
-BaseWorldObject<T>::BaseWorldObject(T *state, int x, int y, int w, int h)
-    : state(state)
-{
-    rect.w = w;
-    rect.h = h;
-    updatePixelPosition(x, y);
-}
-
-template <class T>
-BaseWorldObject<T>::BaseWorldObject(T *state)
-    : state(state)
-{
-    rect.w = 0;
-    rect.h = 0;
-    updateWorldPosition(0,0);
-}
-
-template <class T>
-void BaseWorldObject<T>::drawRect()
-{
-    SDL_SetRenderDrawColor(state->renderer, 20, 255, 10, 255);
-    SDL_Rect temp = {rect.x - rect.w/2, rect.y-rect.h/2, rect.w, rect.h};
-    SDL_RenderDrawRect(state->renderer, &temp);
-}
-
-template <class T>
-void BaseWorldObject<T>::drawCircle(Sint16 rad)
-{
-    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 20, 255, 10, 255);
-}
-
-template <class T>
-int BaseWorldObject<T>::worldToPixel(float unit, int dim)
-{
-    return static_cast<int>((unit / state->worldSize[dim]) * state->pixelSize[dim]);
-}
-
-template <class T>
-Eigen::Array2i BaseWorldObject<T>::worldToPixel(Eigen::Array2f units)
-{
-    // (...).template cast<type> is C++ syntax for calling member functions of template objects
-    return ((units / state->worldSize) * state->pixelSize.template cast<float>()).template cast<int>();
-}
-
-template <class T>
-float BaseWorldObject<T>::pixelToWorld(int pixel, int dim)
-{
-    return (static_cast<float>(pixel) / state->pixelSize[dim]) * state->worldSize[dim];
-}
-
-template <class T>
-Eigen::Array2f BaseWorldObject<T>::pixelToWorld(Eigen::Array2i pixels)
-{
-    return (pixels.cast<float>() / state->pixelSize.template cast<float>()) * state->worldSize;
-}
-
-template <class T>
-void BaseWorldObject<T>::updateWorldPosition()
-{    
-    pixelPosition = worldToPixel(worldPosition);
-
-    rect.x = pixelPosition[0];
-    rect.y = pixelPosition[1];
-}
-
-template <class T>
-void BaseWorldObject<T>::updateWorldPosition(float x, float y)
-{
-    worldPosition[0] = x;
-    worldPosition[1] = y;
-    updateWorldPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updateWorldPosition(Eigen::Array2f units)
-{
-    worldPosition = units;
-    updateWorldPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updateWorldPositionX(float x)
-{
-    worldPosition[0] = x;
-    updateWorldPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updateWorldPositionY(float y)
-{
-    worldPosition[1] = y;
-    updateWorldPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updatePixelPosition()
-{
-    worldPosition = pixelToWorld(pixelPosition);
-
-    rect.x = pixelPosition[0];
-    rect.y = pixelPosition[1];
-}
-
-template <class T>
-void BaseWorldObject<T>::updatePixelPosition(int x, int y)
-{
-    pixelPosition[0] = x;
-    pixelPosition[1] = y;
-    updatePixelPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updatePixelPosition(Eigen::Array2i pixels)
-{
-    pixelPosition = pixels;
-    updatePixelPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updatePixelPositionX(int x)
-{
-    pixelPosition[0] = x;
-    updatePixelPosition();
-}
-
-template <class T>
-void BaseWorldObject<T>::updatePixelPositionY(int y)
-{
-    pixelPosition[1] = y;
-    updatePixelPosition();
-}
 
 #endif
