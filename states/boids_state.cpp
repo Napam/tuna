@@ -134,7 +134,6 @@ void FpsCounter::update()
         this->setText(cstr);
         prevTime = SDL_GetTicks();
     }
-    // std::cout << "Updating FpsCounter: " << cstr << "\n";
 }
 
 Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,

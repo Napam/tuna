@@ -18,6 +18,8 @@ TTFText::TTFText(BaseState *state, const char* file, int ptsize,
 
     rect.x = x;
     rect.y = y;
+
+    this->setText("Sample text");
 }
 
 TTFText::TTFText(BaseState *state, const char* file, int ptsize, 
@@ -35,6 +37,8 @@ TTFText::TTFText(BaseState *state, const char* file, int ptsize,
 
     rect.x = int(x * w);
     rect.y = int(y * h);
+
+    this->setText("Sample text");
 }
 
 TTFText::TTFText(BaseState *state, json &j)
@@ -54,6 +58,8 @@ TTFText::TTFText(BaseState *state, json &j)
         exit(-1);
     }
     updateWorldPosition(j["x"].get<float>()*state->worldSize[0], j["y"].get<float>()*state->worldSize[1]);
+
+    this->setText("Sample text");
 }
 
 TTFText::~TTFText()
