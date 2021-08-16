@@ -100,7 +100,6 @@ public:
     */
     void addInputEventListener(StateEventListener *listener);
 
-
     /*
     Runs state, this should not be overriden. 
     */

@@ -13,5 +13,6 @@ int main(int argc, char **argv)
     std::cout << static_cast<int>(j3["boids"]["fpsMonitor"]["color"][1].get<unsigned char>()) << "\n";
     std::cout << static_cast<int>(j3["boids"]["fpsMonitor"]["color"][2].get<unsigned char>()) << "\n";
     std::cout << static_cast<int>(j3["boids"]["fpsMonitor"]["color"][3].get<unsigned char>()) << "\n";
+    std::cout << j3["boids"]["misc"] << "\n";
     return 0;
 }

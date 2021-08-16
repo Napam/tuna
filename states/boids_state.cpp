@@ -4,9 +4,8 @@
 #include <vector>
 #include <cmath>
 #include "../include/base_state.hpp"
+#include "../include/utils.hpp"
 #include "../include/boids_state.hpp"
-#include "../include/utils.hpp"
-#include "../include/utils.hpp"
 #include "../include/fonts.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -51,22 +50,22 @@ void Squareboy::interactUser()
 
     if (keys[SDL_SCANCODE_A])
     {
-        acceleration[0] -= 2;
+        acceleration[0] += 2;
     }
 
     if (keys[SDL_SCANCODE_D])
     {
-        acceleration[0] += 2;
+        acceleration[0] -= 2;
     }
 
     if (keys[SDL_SCANCODE_W])
     {
-        acceleration[1] -= 2;
+        acceleration[1] += 2;
     }
 
     if (keys[SDL_SCANCODE_S])
     {
-        acceleration[1] += 2;
+        acceleration[1] -= 2;
     }
 
     if (keys[SDL_SCANCODE_SPACE])
@@ -115,12 +114,18 @@ class FpsCounter : public TTFText
 public:
     Uint32 prevTime, updateRate;
     FpsCounter(BaseState *state);
+    ~FpsCounter();
     virtual void update();
 };
 
 FpsCounter::FpsCounter(BaseState *state) 
     : TTFText(state, state->config["boids"]["fpsMonitor"]), prevTime(SDL_GetTicks()), updateRate(250)
 {
+}
+
+FpsCounter::~FpsCounter()
+{
+    std::cout << "Deleting FpsCounter\n";
 }
 
 void FpsCounter::update() 
@@ -166,15 +171,19 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
     this->worldSize << worldWidth, worldHeight;
 
     // Grid of squarebois
-    for (int i = 0; i < 5; i++)
+    int n = config["boids"]["misc"]["nStartBoxes"].get<int>();
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < 5; j++)
+        for (int j = 0; j < n; j++)
         {
             entities->emplace_back(new Squareboy(this, 100 + i * 50, 100 + j * 50, 20, 20));
         }
     }
 
-    entities->emplace_back(new FpsCounter(this));
+    if (config["boids"]["fpsMonitor"]["use"].get<bool>())
+    {
+        entities->emplace_back(new FpsCounter(this));
+    }
 };
 
 Boids::~Boids()
