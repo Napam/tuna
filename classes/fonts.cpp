@@ -42,7 +42,7 @@ TTFText::TTFText(BaseState *state, const char* file, int ptsize,
 }
 
 TTFText::TTFText(BaseState *state, json &j)
-    : BaseWorldObject(state)
+    : BaseWorldObject(state), surface(NULL), texture(NULL)
 {
     color = {
         j["color"][0].get<Uint8>(),
@@ -64,12 +64,22 @@ TTFText::TTFText(BaseState *state, json &j)
 
 TTFText::~TTFText()
 {
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
+    if (surface != NULL)
+    {
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(texture);
+    }
+
+    std::cout << "Deleted TTFText object\n"; 
 }
 
 void TTFText::setText(const char *text)
 {
+    if (surface != NULL) {
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(texture);
+    }
+
     surface = TTF_RenderText_Solid(font, text, color);
     texture = SDL_CreateTextureFromSurface(state->renderer, surface);
 

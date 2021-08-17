@@ -6,7 +6,7 @@
     },
     "boids":{
         "fpsMonitor":{
-            "use":false,
+            "use":true,
             "ptsize":16,
             "x":0.01,
             "y":0.96,
@@ -14,7 +14,7 @@
             "fontFile": "Lato-Regular.ttf"
         },
         "misc":{
-            "nStartBoxes":3
+            "nStartBoxes":2
         }
     }
  }

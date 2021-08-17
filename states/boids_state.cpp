@@ -25,7 +25,12 @@ public:
     void blit();
     void motion();
     virtual void update();
+    virtual ~Squareboy();
 };
+
+Squareboy::~Squareboy()
+{
+}
 
 Squareboy::Squareboy(BaseState *state, float x, float y, int w, int h)
     : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
@@ -233,7 +238,7 @@ void Boids::onMouseUp(Uint8 button) {
 }
 
 /*
-What to do in one iteration in game loop, will be called by BaseState::run, no need to 
+What to do in one iteration in game loop, will be called by BaseState::run, no need to
 manually write game loop here
 */
 void Boids::update()

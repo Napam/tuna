@@ -25,7 +25,6 @@ BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *even
       config(config), clock(Clock(config["targetFps"].get<int>()))
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
-    inputEventListeners = new std::vector<StateEventListener *>;
     std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
 }
 

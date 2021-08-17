@@ -76,7 +76,7 @@ public:
     json &config; // Config json reader thing
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
-    ~BaseState();
+    virtual ~BaseState() = 0;
 
     /*
     Fills window with color, used for "clearing" the screen
@@ -129,6 +129,7 @@ public:
      */
     BaseWorldObject(BaseState *state);
     
+    virtual ~BaseWorldObject() = 0;
     virtual void update() = 0;
 
     /*
