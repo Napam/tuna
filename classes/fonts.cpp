@@ -66,9 +66,11 @@ TTFText::~TTFText()
 {
     if (surface != NULL)
     {
-        SDL_FreeSurface(surface);
         SDL_DestroyTexture(texture);
+        SDL_FreeSurface(surface);
     }
+
+    TTF_CloseFont(font);
 
     std::cout << "Deleted TTFText object\n"; 
 }
@@ -76,8 +78,8 @@ TTFText::~TTFText()
 void TTFText::setText(const char *text)
 {
     if (surface != NULL) {
-        SDL_FreeSurface(surface);
         SDL_DestroyTexture(texture);
+        SDL_FreeSurface(surface);
     }
 
     surface = TTF_RenderText_Solid(font, text, color);

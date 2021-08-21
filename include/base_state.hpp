@@ -129,7 +129,7 @@ public:
      */
     BaseWorldObject(BaseState *state);
     
-    virtual ~BaseWorldObject() = 0;
+    virtual ~BaseWorldObject() {};
     virtual void update() = 0;
 
     /*
