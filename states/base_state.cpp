@@ -21,8 +21,8 @@ void Clock::fpsControll()
 
 BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config)
     : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
-      inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(NULL)),
-      config(config), clock(Clock(config["targetFps"].get<int>()))
+      inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(nullptr)),
+      config(config), clock(Clock(config["targetFps"].get<int>())), mouseIsDown(false)
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
     std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
@@ -77,6 +77,7 @@ void BaseState::handleUserInput()
         
         case SDL_MOUSEBUTTONDOWN:
             mouseDown = (*event).button.button;
+            mouseIsDown = true;
             for (StateEventListener *listener : *inputEventListeners)
             {
                 listener->onMouseDown(mouseDown);
@@ -85,6 +86,7 @@ void BaseState::handleUserInput()
         
         case SDL_MOUSEBUTTONUP:
             mouseUp = (*event).button.button;
+            mouseIsDown = false;
             for (StateEventListener *listener : *inputEventListeners)
             {
                 listener->onMouseUp(mouseUp);

@@ -5,7 +5,7 @@
 #include <fstream>
 #include "include/utils.hpp"
 #include "include/base_state.hpp"
-#include "include/boids_state.hpp"
+#include "include/simple_state.hpp"
 
 using json = nlohmann::json;
 
@@ -22,10 +22,10 @@ int main(int argc, char **argv)
         &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
     );
 
-    Boids *boids = new Boids(window, renderer, &event, j3);
-    boids->run();
+    SimpleState *simple = new SimpleState(window, renderer, &event, j3);
+    simple->run();
 
-    delete boids;
+    delete simple;
 
     /* Free all objects*/
     SDL_DestroyRenderer(renderer);

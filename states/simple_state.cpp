@@ -5,7 +5,7 @@
 #include <cmath>
 #include "../include/base_state.hpp"
 #include "../include/utils.hpp"
-#include "../include/boids_state.hpp"
+#include "../include/simple_state.hpp"
 #include "../include/fonts.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -88,6 +88,24 @@ void Squareboy::interactUser()
         velocity -= velocity * 0.1 * state->worldDt;
     }
 
+    Eigen::Array2f diff;
+    float force, norm;
+    std::vector<void*> entites;
+
+    entites = *((SimpleState*)state)->entities;
+
+    // Can be more vectorized
+    for (void *ent : entites) {
+        if (ent == this) {
+            continue;
+        }
+        diff = (worldPosition - ((BaseWorldObject*)ent)->worldPosition) + 1e-8;
+        norm = diff.matrix().squaredNorm(); // Euclidean norm
+        force = std::min(1000000 / std::pow(norm, 2), 10.0);
+        diff /= norm; 
+        acceleration += diff * force;
+    }
+
     velocity += acceleration * state->worldDt;
 }
 
@@ -146,7 +164,7 @@ void FpsCounter::update()
     }
 }
 
-Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
+SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
              json &config, float worldWidth, float worldHeight)
     : BaseState(window, renderer, event, config)
 {
@@ -191,7 +209,7 @@ Boids::Boids(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
     }
 };
 
-Boids::~Boids()
+SimpleState::~SimpleState()
 {
     for (void *ent : *entities)
     {
@@ -200,7 +218,7 @@ Boids::~Boids()
     delete entities;
 }
 
-void Boids::updateGraphics()
+void SimpleState::updateGraphics()
 {
     // Fill sceen with black
     clearfill(0, 0, 0, 255);
@@ -214,15 +232,21 @@ void Boids::updateGraphics()
     SDL_RenderPresent(renderer);
 }
 
-void Boids::logic()
+void SimpleState::logic()
 {
     for (void *ent : *entities)
     {
         ((BaseWorldObject *)ent)->update();
     }
+
+    if (mouseIsDown && keystates[SDL_SCANCODE_LCTRL]) {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        entities->emplace_back(new Squareboy(this, x, y, 20, 20));
+    }
 }
 
-void Boids::onMouseDown(Uint8 button) {
+void SimpleState::onMouseDown(Uint8 button) {
     if (button == SDL_BUTTON_LEFT) {
         int x, y;
         SDL_GetMouseState(&x, &y);
@@ -232,7 +256,7 @@ void Boids::onMouseDown(Uint8 button) {
     if (button == SDL_BUTTON_RIGHT) {}
 }
 
-void Boids::onMouseUp(Uint8 button) {
+void SimpleState::onMouseUp(Uint8 button) {
     if (button == SDL_BUTTON_LEFT) {}
     if (button == SDL_BUTTON_RIGHT) {}
 }
@@ -241,7 +265,7 @@ void Boids::onMouseUp(Uint8 button) {
 What to do in one iteration in game loop, will be called by BaseState::run, no need to
 manually write game loop here
 */
-void Boids::update()
+void SimpleState::update()
 {
     logic();
     updateGraphics();

@@ -64,6 +64,7 @@ public:
     SDL_Event *event;
     SDL_Keycode keyDown;
     SDL_Keycode keyUp;
+    bool mouseIsDown;
     Uint8 mouseDown;
     Uint8 mouseUp;
     SDL_Window *window;

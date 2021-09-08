@@ -42,7 +42,7 @@ TTFText::TTFText(BaseState *state, const char* file, int ptsize,
 }
 
 TTFText::TTFText(BaseState *state, json &j)
-    : BaseWorldObject(state), surface(NULL), texture(NULL)
+    : BaseWorldObject(state), surface(nullptr), texture(nullptr)
 {
     color = {
         j["color"][0].get<Uint8>(),
@@ -64,7 +64,7 @@ TTFText::TTFText(BaseState *state, json &j)
 
 TTFText::~TTFText()
 {
-    if (surface != NULL)
+    if (surface != nullptr)
     {
         SDL_DestroyTexture(texture);
         SDL_FreeSurface(surface);
@@ -77,7 +77,7 @@ TTFText::~TTFText()
 
 void TTFText::setText(const char *text)
 {
-    if (surface != NULL) {
+    if (surface != nullptr) {
         SDL_DestroyTexture(texture);
         SDL_FreeSurface(surface);
     }
@@ -91,7 +91,7 @@ void TTFText::setText(const char *text)
 
 void TTFText::blit()
 {
-    SDL_RenderCopy(state->renderer, texture, NULL, &rect);
+    SDL_RenderCopy(state->renderer, texture, nullptr, &rect);
 }
 
 void TTFText::update()

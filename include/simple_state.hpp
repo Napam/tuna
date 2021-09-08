@@ -1,5 +1,5 @@
-#ifndef BOIDS_STATE_H
-#define BOIDS_STATE_H
+#ifndef SIMPLE_STATE_H
+#define SIMPLE_STATE_H
 
 #include <SDL2/SDL.h>
 #include "../include/base_state.hpp"
@@ -8,14 +8,14 @@
 
 using json = nlohmann::json;
 
-class Boids : public BaseState, public StateEventListener
+class SimpleState : public BaseState, public StateEventListener
 {
 public:
     std::vector<void *> *entities; // Stores game entities
     
-    Boids(SDL_Window *window, SDL_Renderer *renderer,
+    SimpleState(SDL_Window *window, SDL_Renderer *renderer,
           SDL_Event *event, json &config, float worldWidth = 2000, float worldHeight = -1);
-    ~Boids();
+    ~SimpleState();
 
     /*
     Blits and flips
