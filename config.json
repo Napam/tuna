@@ -4,7 +4,7 @@
     "debug":{
         "circleRadius":4
     },
-    "boids":{
+    "simple":{
         "fpsMonitor":{
             "use":true,
             "ptsize":16,
@@ -14,7 +14,9 @@
             "fontFile": "Lato-Regular.ttf"
         },
         "misc":{
-            "nStartBoxes":5
+            "nStartBoxes":5,
+            "repel":500000,
+            "attract":1000
         }
     }
  }

@@ -17,6 +17,7 @@ class Squareboy
 {
 public:
     Eigen::Array2f velocity, acceleration;
+    float repel{state->config["simple"]["misc"]["repel"]}, attract{state->config["simple"]["misc"]["attract"]};
     bool spacemode;
     Squareboy(BaseState *state, float x, float y, int w, int h);
     Squareboy(BaseState *state, int x, int y, int w, int h);
@@ -51,7 +52,6 @@ void Squareboy::blit()
 void Squareboy::interactUser()
 {
     const Uint8 *keys = state->keystates;
-    acceleration = 0;
 
     if (keys[SDL_SCANCODE_A])
     {
@@ -87,10 +87,18 @@ void Squareboy::interactUser()
     {
         velocity -= velocity * 0.1 * state->worldDt;
     }
+}
 
+void Squareboy::behave()
+{
     Eigen::Array2f diff;
-    float force, norm;
+    float repelForce, norm, attractForce;
     std::vector<void*> entites;
+
+    if ((pixelPosition[0] < 0) || (pixelPosition[0] > state->pixelSize[0]))
+        updatePixelPositionX(pymod(pixelPosition[0], state->pixelSize[0]));
+    else if ((pixelPosition[1] < 0) || (pixelPosition[1] > state->pixelSize[1]))
+        updatePixelPositionY(pymod(pixelPosition[1], state->pixelSize[1]));
 
     entites = *((SimpleState*)state)->entities;
 
@@ -100,38 +108,32 @@ void Squareboy::interactUser()
             continue;
         }
         diff = (worldPosition - ((BaseWorldObject*)ent)->worldPosition) + 1e-8;
-        norm = diff.matrix().squaredNorm(); // Euclidean norm
-        force = std::min(1000000 / std::pow(norm, 2), 10.0);
+        norm = diff.matrix().squaredNorm() + 1e-4; // Euclidean norm
+
+        repelForce = std::min(repel / std::pow(norm, 2), 20.0);
+        attractForce = std::min(attract / norm, 20.0F);
+
         diff /= norm; 
-        acceleration += diff * force;
+        acceleration += diff * (repelForce - attractForce);
     }
-
-    velocity += acceleration * state->worldDt;
-}
-
-void Squareboy::behave()
-{
-    if ((pixelPosition[0] < 0) || (pixelPosition[0] > state->pixelSize[0]))
-        updatePixelPositionX(pymod(pixelPosition[0], state->pixelSize[0]));
-    else if ((pixelPosition[1] < 0) || (pixelPosition[1] > state->pixelSize[1]))
-        updatePixelPositionY(pymod(pixelPosition[1], state->pixelSize[1]));
 }
 
 void Squareboy::motion()
 {
-    velocity -= velocity * 0.05 * state->worldDt;
+    velocity += acceleration * state->worldDt;
+    velocity -= velocity * 0.08 * state->worldDt;
     updateWorldPosition(worldPosition + velocity * state->worldDt);
 }
 
 void Squareboy::update()
 {
+    acceleration = 0;
     interactUser();
     behave();
     motion();
 }
 
 // ############################################################################################# //
-
 class FpsCounter : public TTFText
 {
 public:
@@ -142,7 +144,7 @@ public:
 };
 
 FpsCounter::FpsCounter(BaseState *state) 
-    : TTFText(state, state->config["boids"]["fpsMonitor"]), prevTime(SDL_GetTicks()), updateRate(250)
+    : TTFText(state, state->config["simple"]["fpsMonitor"]), prevTime(SDL_GetTicks()), updateRate(250)
 {
 }
 
@@ -194,7 +196,7 @@ SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *
     this->worldSize << worldWidth, worldHeight;
 
     // Grid of squarebois
-    int n = config["boids"]["misc"]["nStartBoxes"].get<int>();
+    int n = config["simple"]["misc"]["nStartBoxes"].get<int>();
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
@@ -203,7 +205,7 @@ SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *
         }
     }
 
-    if (config["boids"]["fpsMonitor"]["use"].get<bool>())
+    if (config["simple"]["fpsMonitor"]["use"].get<bool>())
     {
         entities->emplace_back(new FpsCounter(this));
     }
