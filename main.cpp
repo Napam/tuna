@@ -4,8 +4,8 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include "include/utils.hpp"
-#include "include/base_state.hpp"
-#include "include/simple_state.hpp"
+#include "include/baseState.hpp"
+#include "include/simpleState.hpp"
 
 using json = nlohmann::json;
 

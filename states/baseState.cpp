@@ -1,4 +1,4 @@
-#include "../include/base_state.hpp"
+#include "../include/baseState.hpp"
 #include <iostream>
 #include <eigen3/Eigen/Dense>
 #include <nlohmann/json.hpp>
@@ -6,9 +6,24 @@
 using namespace Eigen;
 using json = nlohmann::json;
 
+MousePointer::MousePointer(BaseState *state)
+    : BaseWorldObject(state)
+{
+    rect.w = 0;
+    rect.h = 0;
+}
+
+void MousePointer::update()
+{
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    updatePixelPosition(x, y);
+    // std::cout << x << "," << y << "\n";
+}
+
 Clock::Clock(Uint8 targetFps)
     : targetFps(targetFps), targetFrameTime(1000 / targetFps), dt(targetFrameTime),
-      prevTime(SDL_GetTicks()) {std::cout << "targetFrameTime: " << targetFrameTime << std::endl;}
+      prevTime(SDL_GetTicks()) { std::cout << "targetFrameTime: " << targetFrameTime << std::endl; }
 
 void Clock::fpsControll()
 {
@@ -20,9 +35,9 @@ void Clock::fpsControll()
 }
 
 BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config)
-    : window(window), renderer(renderer), event(event), active(false), eventHappened(false),
+    : window(window), renderer(renderer), event(event), active(false),
       inputEventListeners(new std::vector<StateEventListener *>), keystates(SDL_GetKeyboardState(nullptr)),
-      config(config), clock(Clock(config["targetFps"].get<int>())), mouseIsDown(false)
+      config(config), clock(Clock(config["targetFps"].get<int>())), mousePointer(new MousePointer(this))
 {
     SDL_GetWindowSize(window, &pixelSize[0], &pixelSize[1]);
     std::cout << "(" << pixelSize[0] << "," << pixelSize[1] << ")\n";
@@ -31,6 +46,7 @@ BaseState::BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *even
 BaseState::~BaseState()
 {
     delete inputEventListeners;
+    delete mousePointer;
 }
 
 void BaseState::addInputEventListener(StateEventListener *listener)
@@ -74,22 +90,52 @@ void BaseState::handleUserInput()
                 listener->onKeyUp(keyUp);
             }
             break;
-        
+
         case SDL_MOUSEBUTTONDOWN:
             mouseDown = (*event).button.button;
-            mouseIsDown = true;
+    
+            switch (mouseDown)
+            {
+            case SDL_BUTTON_LEFT:
+                mouseLeftIsDown = true;
+                break;
+            case SDL_BUTTON_MIDDLE:
+                mouseMiddleIsDown = true;
+                break;
+            case SDL_BUTTON_RIGHT:
+                mouseRightIsDown = true;
+                break;
+            default:
+                break;
+            }
+
             for (StateEventListener *listener : *inputEventListeners)
             {
-                listener->onMouseDown(mouseDown);
+                listener->onMouseDown();
             }
             break;
-        
+
         case SDL_MOUSEBUTTONUP:
             mouseUp = (*event).button.button;
-            mouseIsDown = false;
+            
+            switch (mouseUp)
+            {
+            case SDL_BUTTON_LEFT:
+                mouseLeftIsDown = false;
+                break;
+            case SDL_BUTTON_MIDDLE:
+                mouseMiddleIsDown = false;
+                break;
+            case SDL_BUTTON_RIGHT:
+                mouseRightIsDown = false;
+                break;
+            default:
+                break;
+            }
+
             for (StateEventListener *listener : *inputEventListeners)
             {
-                listener->onMouseUp(mouseUp);
+                listener->onMouseUp();
             }
             break;
         }
@@ -113,6 +159,7 @@ void BaseState::run()
     while (active)
     {
         handleUserInput();
+        mousePointer->update();
         update();
         clock.fpsControll();
         worldDt = clock.frameTime / clock.targetFrameTime;
@@ -129,8 +176,6 @@ BaseWorldObject::BaseWorldObject(BaseState *state, float x, float y, int w, int 
     updateWorldPosition(w, h);
 }
 
-
-
 BaseWorldObject::BaseWorldObject(BaseState *state, int x, int y, int w, int h)
     : state(state)
 {
@@ -139,35 +184,30 @@ BaseWorldObject::BaseWorldObject(BaseState *state, int x, int y, int w, int h)
     updatePixelPosition(x, y);
 }
 
-
 BaseWorldObject::BaseWorldObject(BaseState *state)
     : state(state)
 {
     rect.w = 0;
     rect.h = 0;
-    updateWorldPosition(0,0);
+    updateWorldPosition(0, 0);
 }
-
 
 void BaseWorldObject::drawRect()
 {
     SDL_SetRenderDrawColor(state->renderer, 20, 255, 10, 255);
-    SDL_Rect temp = {rect.x - rect.w/2, rect.y-rect.h/2, rect.w, rect.h};
+    SDL_Rect temp = {rect.x - rect.w / 2, rect.y - rect.h / 2, rect.w, rect.h};
     SDL_RenderDrawRect(state->renderer, &temp);
 }
-
 
 void BaseWorldObject::drawCircle(Sint16 rad)
 {
     filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 20, 255, 10, 255);
 }
 
-
 int BaseWorldObject::worldToPixel(float unit, int dim)
 {
     return static_cast<int>((unit / state->worldSize[dim]) * state->pixelSize[dim]);
 }
-
 
 Eigen::Array2i BaseWorldObject::worldToPixel(Eigen::Array2f units)
 {
@@ -178,12 +218,10 @@ Eigen::Array2i BaseWorldObject::worldToPixel(Eigen::Array2f units)
     return ((units / state->worldSize) * state->pixelSize.cast<float>()).cast<int>();
 }
 
-
 float BaseWorldObject::pixelToWorld(int pixel, int dim)
 {
     return (static_cast<float>(pixel) / state->pixelSize[dim]) * state->worldSize[dim];
 }
-
 
 Eigen::Array2f BaseWorldObject::pixelToWorld(Eigen::Array2i pixels)
 {
@@ -191,15 +229,13 @@ Eigen::Array2f BaseWorldObject::pixelToWorld(Eigen::Array2i pixels)
     return ((pixels.cast<float>() / state->pixelSize.cast<float>()) * state->worldSize).cast<float>();
 }
 
-
 void BaseWorldObject::updateWorldPosition()
-{    
+{
     pixelPosition = worldToPixel(worldPosition);
 
     rect.x = pixelPosition[0];
     rect.y = pixelPosition[1];
 }
-
 
 void BaseWorldObject::updateWorldPosition(float x, float y)
 {
@@ -208,13 +244,11 @@ void BaseWorldObject::updateWorldPosition(float x, float y)
     updateWorldPosition();
 }
 
-
 void BaseWorldObject::updateWorldPosition(Eigen::Array2f units)
 {
     worldPosition = units;
     updateWorldPosition();
 }
-
 
 void BaseWorldObject::updateWorldPositionX(float x)
 {
@@ -222,13 +256,11 @@ void BaseWorldObject::updateWorldPositionX(float x)
     updateWorldPosition();
 }
 
-
 void BaseWorldObject::updateWorldPositionY(float y)
 {
     worldPosition[1] = y;
     updateWorldPosition();
 }
-
 
 void BaseWorldObject::updatePixelPosition()
 {
@@ -238,7 +270,6 @@ void BaseWorldObject::updatePixelPosition()
     rect.y = pixelPosition[1];
 }
 
-
 void BaseWorldObject::updatePixelPosition(int x, int y)
 {
     pixelPosition[0] = x;
@@ -246,20 +277,17 @@ void BaseWorldObject::updatePixelPosition(int x, int y)
     updatePixelPosition();
 }
 
-
 void BaseWorldObject::updatePixelPosition(Eigen::Array2i pixels)
 {
     pixelPosition = pixels;
     updatePixelPosition();
 }
 
-
 void BaseWorldObject::updatePixelPositionX(int x)
 {
     pixelPosition[0] = x;
     updatePixelPosition();
 }
-
 
 void BaseWorldObject::updatePixelPositionY(int y)
 {

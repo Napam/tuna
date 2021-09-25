@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "../include/base_state.hpp"
+#include "../include/baseState.hpp"
 
 using json = nlohmann::json;
 

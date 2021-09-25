@@ -9,6 +9,9 @@
 
 using json = nlohmann::json;
 
+class BaseWorldObject;
+class MousePointer;
+
 /*
 Clock used for fps controll and logging time (for example for physics stuff)
 
@@ -46,8 +49,8 @@ public:
     virtual ~StateEventListener() {}; // StackOverflow said it was good to do this
     virtual void onKeyDown(SDL_Keycode key) = 0;
     virtual void onKeyUp(SDL_Keycode key) = 0;
-    virtual void onMouseDown(Uint8 button) = 0;
-    virtual void onMouseUp(Uint8 button) = 0;
+    virtual void onMouseDown() = 0;
+    virtual void onMouseUp() = 0;
 };
 
 /*
@@ -59,12 +62,13 @@ protected:
     std::vector<StateEventListener *> *inputEventListeners;
 
 public:
-    bool active;
-    bool eventHappened;
+    bool active = false;
     SDL_Event *event;
     SDL_Keycode keyDown;
     SDL_Keycode keyUp;
-    bool mouseIsDown;
+    bool mouseLeftIsDown = false;
+    bool mouseMiddleIsDown = false;
+    bool mouseRightIsDown = false;
     Uint8 mouseDown;
     Uint8 mouseUp;
     SDL_Window *window;
@@ -72,12 +76,13 @@ public:
     float worldDt; // "world dt = world delta time, for physics"
     const Uint8 *keystates;
     Clock clock;
+    MousePointer *mousePointer;
     Eigen::Array2i pixelSize; // Window size in pixels
     Eigen::Array2f worldSize; // Window size in world units
     json &config; // Config json reader thing
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
-    virtual ~BaseState() = 0;
+    virtual ~BaseState();
 
     /*
     Fills window with color, used for "clearing" the screen
@@ -113,9 +118,9 @@ public:
 };
 
 /*
-Template class for objects that should interact with BaseState
+Base class for objects that should interact with BaseState
 */
-class BaseWorldObject // T should inherit BaseState template
+class BaseWorldObject 
 {
 public:
     SDL_Rect rect; // All objects are enclosed in their rects, representing their area
@@ -224,6 +229,17 @@ public:
     void updatePixelPositionY(int y);
 
     virtual void blit() = 0;
+};
+
+/*
+A BaseWorldObject for the mousepointer. 
+*/
+class MousePointer : public BaseWorldObject 
+{
+public:
+    MousePointer(BaseState *state);
+    virtual void update();
+    virtual void blit() {};
 };
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef STATE_MANAGER_H
 #define STATE_MANAGER_H
 
-#include "../include/base_state.hpp"
+#include "../include/baseState.hpp"
 #include <unordered_map>
 
 class StateManager

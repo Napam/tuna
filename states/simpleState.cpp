@@ -3,9 +3,9 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <cmath>
-#include "../include/base_state.hpp"
+#include "../include/baseState.hpp"
 #include "../include/utils.hpp"
-#include "../include/simple_state.hpp"
+#include "../include/simpleState.hpp"
 #include "../include/fonts.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
@@ -77,7 +77,7 @@ void Squareboy::interactUser()
     {
         acceleration *= 6;
     }
-    
+
     if (keys[SDL_SCANCODE_LSHIFT])
     {
         acceleration /= 6;
@@ -93,27 +93,29 @@ void Squareboy::behave()
 {
     Eigen::Array2f diff;
     float repelForce, norm, attractForce;
-    std::vector<void*> entites;
+    std::vector<void *> entites;
 
     if ((pixelPosition[0] < 0) || (pixelPosition[0] > state->pixelSize[0]))
         updatePixelPositionX(pymod(pixelPosition[0], state->pixelSize[0]));
     else if ((pixelPosition[1] < 0) || (pixelPosition[1] > state->pixelSize[1]))
         updatePixelPositionY(pymod(pixelPosition[1], state->pixelSize[1]));
 
-    entites = *((SimpleState*)state)->entities;
+    entites = *((SimpleState *)state)->entities;
 
     // Can be more vectorized
-    for (void *ent : entites) {
-        if (ent == this) {
+    for (void *ent : entites)
+    {
+        if (ent == this)
+        {
             continue;
         }
-        diff = (worldPosition - ((BaseWorldObject*)ent)->worldPosition) + 1e-8;
-        norm = diff.matrix().squaredNorm() + 1e-4; // Euclidean norm
+        diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + 1e-6;
+        norm = diff.matrix().squaredNorm() + 1e-6; // Euclidean norm
 
         repelForce = std::min(repel / std::pow(norm, 2), 20.0);
         attractForce = std::min(attract / norm, 20.0F);
 
-        diff /= norm; 
+        diff /= norm;
         acceleration += diff * (repelForce - attractForce);
     }
 }
@@ -143,7 +145,7 @@ public:
     virtual void update();
 };
 
-FpsCounter::FpsCounter(BaseState *state) 
+FpsCounter::FpsCounter(BaseState *state)
     : TTFText(state, state->config["simple"]["fpsMonitor"]), prevTime(SDL_GetTicks()), updateRate(250)
 {
 }
@@ -153,9 +155,10 @@ FpsCounter::~FpsCounter()
     std::cout << "Deleting FpsCounter\n";
 }
 
-void FpsCounter::update() 
+void FpsCounter::update()
 {
-    if ((SDL_GetTicks() - prevTime) > updateRate) {
+    if ((SDL_GetTicks() - prevTime) > updateRate)
+    {
         std::stringstream ss;
         // Avoid divison by zero
         ss << "FPS: " << int(1000 / (state->clock.frameTime + 0.001));
@@ -167,7 +170,7 @@ void FpsCounter::update()
 }
 
 SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event,
-             json &config, float worldWidth, float worldHeight)
+                         json &config, float worldWidth, float worldHeight)
     : BaseState(window, renderer, event, config)
 {
     float unitPerPixel;
@@ -241,26 +244,32 @@ void SimpleState::logic()
         ((BaseWorldObject *)ent)->update();
     }
 
-    if (mouseIsDown && keystates[SDL_SCANCODE_LCTRL]) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        entities->emplace_back(new Squareboy(this, x, y, 20, 20));
+    if (mouseLeftIsDown && keystates[SDL_SCANCODE_LCTRL])
+    {
+        entities->emplace_back(new Squareboy(this, mousePointer->pixelPosition[0], mousePointer->pixelPosition[1], 20, 20));
     }
 }
 
-void SimpleState::onMouseDown(Uint8 button) {
-    if (button == SDL_BUTTON_LEFT) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        entities->emplace_back(new Squareboy(this, x, y, 20, 20));
+void SimpleState::onMouseDown()
+{
+    if (mouseLeftIsDown)
+    {
+        entities->emplace_back(new Squareboy(this, mousePointer->pixelPosition[0], mousePointer->pixelPosition[1], 20, 20));
     }
-        
-    if (button == SDL_BUTTON_RIGHT) {}
+
+    if (mouseRightIsDown)
+    {
+    }
 }
 
-void SimpleState::onMouseUp(Uint8 button) {
-    if (button == SDL_BUTTON_LEFT) {}
-    if (button == SDL_BUTTON_RIGHT) {}
+void SimpleState::onMouseUp()
+{
+    if (!mouseLeftIsDown)
+    {
+    }
+    if (!mouseRightIsDown)
+    {
+    }
 }
 
 /*

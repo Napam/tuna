@@ -2,7 +2,7 @@
 #define SIMPLE_STATE_H
 
 #include <SDL2/SDL.h>
-#include "../include/base_state.hpp"
+#include "../include/baseState.hpp"
 #include <vector>
 #include <nlohmann/json.hpp>
 
@@ -29,8 +29,8 @@ public:
 
     void onKeyDown(SDL_Keycode key) {};
     void onKeyUp(SDL_Keycode key) {};
-    void onMouseDown(Uint8 button);
-    void onMouseUp(Uint8 button);
+    void onMouseDown();
+    void onMouseUp();
     
     /*
     Implements abstract method of BaseState
