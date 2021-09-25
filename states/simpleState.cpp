@@ -9,6 +9,7 @@
 #include "../include/fonts.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iomanip>
+#define EPSILON 1e-6
 
 using json = nlohmann::json;
 
@@ -87,6 +88,14 @@ void Squareboy::interactUser()
     {
         velocity -= velocity * 0.1 * state->worldDt;
     }
+
+    Eigen::Array2f diff;
+    float norm;
+    if (state->mouseRightIsDown) {
+        diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
+        norm = diff.matrix().squaredNorm() + EPSILON; // Euclidean norm
+        acceleration -= diff / norm * 50;
+    }
 }
 
 void Squareboy::behave()
@@ -109,7 +118,7 @@ void Squareboy::behave()
         {
             continue;
         }
-        diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + 1e-6;
+        diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + EPSILON;
         norm = diff.matrix().squaredNorm() + 1e-6; // Euclidean norm
 
         repelForce = std::min(repel / std::pow(norm, 2), 20.0);
@@ -122,6 +131,11 @@ void Squareboy::behave()
 
 void Squareboy::motion()
 {
+    float accnorm = acceleration.matrix().squaredNorm();
+    if (accnorm > 200) {
+        acceleration = acceleration / accnorm * 200;
+    }
+
     velocity += acceleration * state->worldDt;
     velocity -= velocity * 0.08 * state->worldDt;
     updateWorldPosition(worldPosition + velocity * state->worldDt);
