@@ -262,6 +262,24 @@ void SimpleState::logic()
     {
         entities->emplace_back(new Squareboy(this, mousePointer->pixelPosition[0], mousePointer->pixelPosition[1], 20, 20));
     }
+
+    if (mouseLeftIsDown && keystates[SDL_SCANCODE_LSHIFT]) 
+    {
+        std::erase_if(*entities, 
+            [mousePos = mousePointer->worldPosition](void *ent){
+                Eigen::Array2f diff;
+                diff = ((BaseWorldObject *)ent)->worldPosition - mousePos;
+                
+                if (diff.matrix().squaredNorm() < 500) {
+                    delete (BaseWorldObject *)ent;
+                    return true;
+                } else {
+                    return false;
+                };
+            }
+        );
+    }
+
 }
 
 void SimpleState::onMouseDown()

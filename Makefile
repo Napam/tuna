@@ -1,4 +1,4 @@
-CPPC = g++ -std=c++17 -O3
+CPPC = g++-10 -std=c++20 -O3
 OUT_FILE = boids.out
 COMPILER_FLAGS = -o $(OUT_FILE)
 MAIN_FILE = main.cpp
