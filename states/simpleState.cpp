@@ -19,6 +19,9 @@ class Squareboy
 public:
     Eigen::Array2f velocity, acceleration;
     float repel{state->config["simple"]["misc"]["repel"]}, attract{state->config["simple"]["misc"]["attract"]};
+    Sint16 circleRadius{state->config["debug"]["circleRadius"]};
+    float mouseForce{state->config["simple"]["misc"]["mouseForce"]};
+    float maxAcc{state->config["simple"]["misc"]["maxAcc"]};
     bool spacemode;
     Squareboy(BaseState *state, float x, float y, int w, int h);
     Squareboy(BaseState *state, int x, int y, int w, int h);
@@ -47,54 +50,27 @@ Squareboy::Squareboy(BaseState *state, int x, int y, int w, int h)
 void Squareboy::blit()
 {
     drawRect();
-    drawCircle(state->config["debug"]["circleRadius"]);
+    drawCircle(circleRadius);
 }
 
 void Squareboy::interactUser()
 {
     const Uint8 *keys = state->keystates;
 
-    if (keys[SDL_SCANCODE_A])
-    {
-        acceleration[0] += 2;
-    }
-
-    if (keys[SDL_SCANCODE_D])
-    {
-        acceleration[0] -= 2;
-    }
-
-    if (keys[SDL_SCANCODE_W])
-    {
-        acceleration[1] += 2;
-    }
-
-    if (keys[SDL_SCANCODE_S])
-    {
-        acceleration[1] -= 2;
-    }
-
-    if (keys[SDL_SCANCODE_SPACE])
-    {
-        acceleration *= 6;
-    }
-
-    if (keys[SDL_SCANCODE_LSHIFT])
-    {
-        acceleration /= 6;
-    }
-
-    if (keys[SDL_SCANCODE_C])
-    {
-        velocity -= velocity * 0.1 * state->worldDt;
-    }
+    if (keys[SDL_SCANCODE_A]) {acceleration[0] += 2;}
+    if (keys[SDL_SCANCODE_D]) {acceleration[0] -= 2;}
+    if (keys[SDL_SCANCODE_W]) { acceleration[1] += 2; }
+    if (keys[SDL_SCANCODE_S]) { acceleration[1] -= 2; }
+    if (keys[SDL_SCANCODE_SPACE]) { acceleration *= 6; }
+    if (keys[SDL_SCANCODE_LSHIFT]) { acceleration /= 6; }
+    if (keys[SDL_SCANCODE_C]) { velocity -= velocity * 0.1 * state->worldDt; }
 
     Eigen::Array2f diff;
     float norm;
     if (state->mouseRightIsDown) {
         diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
-        norm = diff.matrix().squaredNorm() + EPSILON; // Euclidean norm
-        acceleration -= diff / norm * 50;
+        norm = diff.matrix().squaredNorm() + EPSILON; 
+        acceleration -= diff / norm * mouseForce;
     }
 }
 
@@ -114,10 +90,8 @@ void Squareboy::behave()
     // Can be more vectorized
     for (void *ent : entites)
     {
-        if (ent == this)
-        {
-            continue;
-        }
+        if (ent == this) { continue; }
+
         diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + EPSILON;
         norm = diff.matrix().squaredNorm() + 1e-6; // Euclidean norm
 
@@ -132,8 +106,8 @@ void Squareboy::behave()
 void Squareboy::motion()
 {
     float accnorm = acceleration.matrix().squaredNorm();
-    if (accnorm > 200) {
-        acceleration = acceleration / accnorm * 200;
+    if (accnorm > maxAcc) {
+        acceleration = acceleration / accnorm * maxAcc;
     }
 
     velocity += acceleration * state->worldDt;
@@ -247,6 +221,9 @@ void SimpleState::updateGraphics()
         ((BaseWorldObject *)ent)->blit();
     }
 
+    if (keystates[SDL_SCANCODE_LSHIFT])
+        mousePointer->drawCircle(16);
+
     // Flip
     SDL_RenderPresent(renderer);
 }
@@ -264,7 +241,7 @@ void SimpleState::logic()
     }
 
     if (mouseLeftIsDown && keystates[SDL_SCANCODE_LSHIFT]) 
-    {
+    {   
         std::erase_if(*entities, 
             [mousePos = mousePointer->worldPosition](void *ent){
                 Eigen::Array2f diff;

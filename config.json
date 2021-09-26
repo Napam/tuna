@@ -15,8 +15,10 @@
         },
         "misc":{
             "nStartBoxes":5,
-            "repel":500000,
-            "attract":1000
+            "repel":1000000,
+            "attract":1000,
+            "mouseForce":1024,
+            "maxAcc":1024
         }
     }
  }
