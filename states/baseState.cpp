@@ -92,9 +92,7 @@ void BaseState::handleUserInput()
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            mouseDown = (*event).button.button;
-    
-            switch (mouseDown)
+            switch ((*event).button.button)
             {
             case SDL_BUTTON_LEFT:
                 mouseLeftIsDown = true;
@@ -116,9 +114,7 @@ void BaseState::handleUserInput()
             break;
 
         case SDL_MOUSEBUTTONUP:
-            mouseUp = (*event).button.button;
-            
-            switch (mouseUp)
+            switch ((*event).button.button)
             {
             case SDL_BUTTON_LEFT:
                 mouseLeftIsDown = false;
@@ -138,7 +134,18 @@ void BaseState::handleUserInput()
                 listener->onMouseUp();
             }
             break;
+
+        case SDL_MOUSEWHEEL:
+            if(event->wheel.y) 
+            {
+                std::cout << "y: " <<event->wheel.y << "\n";
+            } else {
+                std::cout << "x: " << event->wheel.x << "\n";
+            }
+            
+            break;
         }
+
     }
 }
 

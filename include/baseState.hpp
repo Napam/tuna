@@ -69,8 +69,6 @@ public:
     bool mouseLeftIsDown = false;
     bool mouseMiddleIsDown = false;
     bool mouseRightIsDown = false;
-    Uint8 mouseDown;
-    Uint8 mouseUp;
     SDL_Window *window;
     SDL_Renderer *renderer;
     float worldDt; // "world dt = world delta time, for physics"

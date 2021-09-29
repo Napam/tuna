@@ -1,4 +1,4 @@
-CPPC = g++-10 -std=c++20 -O3
+CPPC = g++-11 -std=c++20 -Ofast
 OUT_FILE = boids.out
 COMPILER_FLAGS = -o $(OUT_FILE)
 MAIN_FILE = main.cpp
@@ -19,3 +19,4 @@ mock:
 clean:
 	rm $(OUT_FILE)
 	rm mock.out
+
