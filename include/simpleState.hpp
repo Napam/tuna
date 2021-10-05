@@ -14,7 +14,7 @@ public:
     std::vector<void *> *entities; // Stores game entities
     
     SimpleState(SDL_Window *window, SDL_Renderer *renderer,
-          SDL_Event *event, json &config, float worldWidth = 2000, float worldHeight = -1);
+          SDL_Event *event, json &config, float worldWidth, float worldHeight);
     ~SimpleState();
 
     /*
@@ -27,10 +27,11 @@ public:
     */
     void logic();
 
-    void onKeyDown(SDL_Keycode key) {};
-    void onKeyUp(SDL_Keycode key) {};
-    void onMouseDown();
-    void onMouseUp();
+    virtual void onKeyDown(SDL_Keycode key) {};
+    virtual void onKeyUp(SDL_Keycode key) {};
+    virtual void onMouseDown();
+    virtual void onMouseUp();
+    virtual void onMousewheel(Sint32 horizontal, Sint32 vertical);
     
     /*
     Implements abstract method of BaseState

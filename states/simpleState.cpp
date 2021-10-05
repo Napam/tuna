@@ -22,7 +22,6 @@ public:
     Sint16 circleRadius{state->config["debug"]["circleRadius"]};
     float mouseForce{state->config["simple"]["misc"]["mouseForce"]};
     float maxAcc{state->config["simple"]["misc"]["maxAcc"]};
-    bool spacemode;
     Squareboy(BaseState *state, float x, float y, int w, int h);
     Squareboy(BaseState *state, int x, int y, int w, int h);
     void interactUser();
@@ -38,12 +37,12 @@ Squareboy::~Squareboy()
 }
 
 Squareboy::Squareboy(BaseState *state, float x, float y, int w, int h)
-    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
+    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0)
 {
 }
 
 Squareboy::Squareboy(BaseState *state, int x, int y, int w, int h)
-    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0), spacemode(false)
+    : BaseWorldObject(state, x, y, w, h), velocity(0.0, 0.0), acceleration(0.0, 0.0)
 {
 }
 
@@ -168,10 +167,7 @@ SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *
     this->addInputEventListener(this);
 
     if ((worldHeight == -1) && (worldWidth == -1))
-    {
-        throw std::invalid_argument(
-            "worldHeight and worldWidth cannot both be -1 stoopid");
-    }
+        throw std::invalid_argument( "worldHeight and worldWidth cannot both be -1 stoopid");
 
     if (worldHeight == -1)
     {
@@ -262,9 +258,7 @@ void SimpleState::logic()
 void SimpleState::onMouseDown()
 {
     if (mouseLeftIsDown)
-    {
         entities->emplace_back(new Squareboy(this, mousePointer->pixelPosition[0], mousePointer->pixelPosition[1], 20, 20));
-    }
 
     if (mouseRightIsDown)
     {
@@ -278,6 +272,17 @@ void SimpleState::onMouseUp()
     }
     if (!mouseRightIsDown)
     {
+    }
+}
+
+void SimpleState::onMousewheel(Sint32 horizontal, Sint32 vertical)
+{
+    if (vertical > 0 ) { // Up
+        worldSize *= 1.05;
+    }
+
+    if (vertical < 0) { // Down
+        worldSize /= 1.05;
     }
 }
 

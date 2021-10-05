@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
     );
 
-    SimpleState *simple = new SimpleState(window, renderer, &event, j3);
+    SimpleState *simple = new SimpleState(window, renderer, &event, j3, 2000, -1);
     simple->run();
 
     delete simple;

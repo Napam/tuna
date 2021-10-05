@@ -51,6 +51,7 @@ public:
     virtual void onKeyUp(SDL_Keycode key) = 0;
     virtual void onMouseDown() = 0;
     virtual void onMouseUp() = 0;
+    virtual void onMousewheel(Sint32 horizontal, Sint32 vertical) = 0;
 };
 
 /*
@@ -59,13 +60,11 @@ Template for states
 class BaseState
 {
 protected:
-    std::vector<StateEventListener *> *inputEventListeners;
+    std::vector<StateEventListener *> *inputEventListeners = new std::vector<StateEventListener *>;
 
 public:
     bool active = false;
     SDL_Event *event;
-    SDL_Keycode keyDown;
-    SDL_Keycode keyUp;
     bool mouseLeftIsDown = false;
     bool mouseMiddleIsDown = false;
     bool mouseRightIsDown = false;
@@ -76,7 +75,7 @@ public:
     Clock clock;
     MousePointer *mousePointer;
     Eigen::Array2i pixelSize; // Window size in pixels
-    Eigen::Array2f worldSize; // Window size in world units
+    Eigen::Array2f worldSize; // Window size in world units, initialized in child classes
     json &config; // Config json reader thing
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
