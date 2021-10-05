@@ -3,17 +3,15 @@
 
 #include <iostream>
 #include <map>
-#include <queue>
+#include <baseState.hpp>
 
 class Manager
 {
 protected:
-    std::map<std::string, std::string> statemap;
-    std::deque<void*> history;
+    std::map<std::string, BaseState*> stateMap;
 public:
-    void add_state();
-    void get_state();
-    void reload_state();
+    void addState(std::string label, BaseState *state);
+    BaseState* getState(std::string label);
 };
 
 #endif
