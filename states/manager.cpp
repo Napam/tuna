@@ -1,4 +1,4 @@
-#include "include/manager.hpp"
+#include "../include/manager.hpp"
 
 void Manager::addState(std::string label, BaseState *state) {
     stateMap[label] = state;

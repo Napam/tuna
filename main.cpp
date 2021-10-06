@@ -9,29 +9,37 @@
 
 using json = nlohmann::json;
 
-int main(int argc, char **argv)
-{
+class GameApp {
+public:
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
+    SimpleState *simpleState;
 
-    std::ifstream configstream("config.json");
-    json j3 = json::parse(configstream);
+    GameApp() {
+        std::ifstream configstream("config.json");
+        json j3 = json::parse(configstream);
 
-    CreateWindowAndRenderer(
-        &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
-    );
+        CreateWindowAndRenderer(
+            &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
+        );
 
-    SimpleState *simple = new SimpleState(window, renderer, &event, j3, 2000, -1);
-    simple->run();
+        SimpleState *simple = new SimpleState(window, renderer, &event, j3, 2000, -1);
+        simple->run();
 
-    delete simple;
+        delete simple;
 
-    /* Free all objects*/
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+        /* Free all objects*/
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
 
-    /* Quit program */
-    SDL_Quit();
+        /* Quit program */
+        SDL_Quit();
+    }
+};
+
+int main(int argc, char **argv)
+{
+    GameApp game;
     return 0;
 }
