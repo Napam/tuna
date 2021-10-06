@@ -6,6 +6,7 @@
 #include "include/utils.hpp"
 #include "include/baseState.hpp"
 #include "include/simpleState.hpp"
+#include "include/manager.hpp"
 
 using json = nlohmann::json;
 
@@ -15,6 +16,8 @@ public:
     SDL_Renderer *renderer;
     SDL_Event event;
     SimpleState *simpleState;
+    BaseState *currentState;
+    Manager manager;
 
     GameApp() {
         std::ifstream configstream("config.json");
@@ -24,10 +27,14 @@ public:
             &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
         );
 
-        SimpleState *simple = new SimpleState(window, renderer, &event, j3, 2000, -1);
-        simple->run();
+        manager.addState("simple", new SimpleState(window, renderer, &event, j3, 2000, -1));
 
-        delete simple;
+        currentState = manager.getState("simple");
+        currentState->activate();
+        while (currentState = currentState->run());
+    }
+
+    ~GameApp() {
 
         /* Free all objects*/
         SDL_DestroyRenderer(renderer);

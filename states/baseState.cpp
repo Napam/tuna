@@ -144,7 +144,7 @@ void BaseState::activate()
     active = true;
 }
 
-void BaseState::run()
+BaseState* BaseState::run()
 {
     activate();
     while (active)
@@ -157,6 +157,8 @@ void BaseState::run()
         // std::cout << "worldDt: " << worldDt << " ("<< clock.frameTime << "ms)"<< std::endl;
         // SDL_Delay(20);
     }
+
+    return nullptr;
 }
 
 BaseWorldObject::BaseWorldObject(BaseState *state, float x, float y, int w, int h)

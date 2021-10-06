@@ -106,7 +106,7 @@ public:
     /*
     Runs state, this should not be overriden. 
     */
-    void run();
+    BaseState* run();
 
     /*
     Abstract function, should implement what to do in one application iteration.
