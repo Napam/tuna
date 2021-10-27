@@ -1,2 +1,2 @@
-# Boids-SDL
-Boids implemented in C++ using SDL2
+# Tuna
+The supreme game engine
