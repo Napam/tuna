@@ -1,9 +1,8 @@
 #include "../include/baseState.hpp"
 #include <iostream>
-#include <eigen3/Eigen/Dense>
+#include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
-using namespace Eigen;
 using json = nlohmann::json;
 
 MousePointer::MousePointer(BaseState *state)
@@ -202,13 +201,9 @@ int BaseWorldObject::worldToPixel(float unit, int dim)
     return static_cast<int>((unit / state->worldSize[dim]) * state->pixelSize[dim]);
 }
 
-Eigen::Array2i BaseWorldObject::worldToPixel(Eigen::Array2f units)
+glm::ivec2 BaseWorldObject::worldToPixel(glm::vec2 units)
 {
-    // (...).template cast<type> is C++ syntax for calling member functions of template objects
-    // ^ Artifact from old code, but I leave it here since it may be useful info
-
-    // Must explicitly cast stuff, or eigen will complain
-    return ((units / state->worldSize) * state->pixelSize.cast<float>()).cast<int>();
+    return (((glm::ivec2)units / (glm::ivec2)state->worldSize) * state->pixelSize);
 }
 
 float BaseWorldObject::pixelToWorld(int pixel, int dim)
@@ -216,10 +211,9 @@ float BaseWorldObject::pixelToWorld(int pixel, int dim)
     return (static_cast<float>(pixel) / state->pixelSize[dim]) * state->worldSize[dim];
 }
 
-Eigen::Array2f BaseWorldObject::pixelToWorld(Eigen::Array2i pixels)
+glm::vec2 BaseWorldObject::pixelToWorld(glm::ivec2 pixels)
 {
-    // Must explicitly cast stuff, or eigen will complain
-    return ((pixels.cast<float>() / state->pixelSize.cast<float>()) * state->worldSize).cast<float>();
+    return (((glm::vec2)pixels / (glm::vec2)state->pixelSize) * state->worldSize);
 }
 
 void BaseWorldObject::updateWorldPosition()
@@ -237,7 +231,7 @@ void BaseWorldObject::updateWorldPosition(float x, float y)
     updateWorldPosition();
 }
 
-void BaseWorldObject::updateWorldPosition(Eigen::Array2f units)
+void BaseWorldObject::updateWorldPosition(glm::vec2 units)
 {
     worldPosition = units;
     updateWorldPosition();
@@ -270,7 +264,7 @@ void BaseWorldObject::updatePixelPosition(int x, int y)
     updatePixelPosition();
 }
 
-void BaseWorldObject::updatePixelPosition(Eigen::Array2i pixels)
+void BaseWorldObject::updatePixelPosition(glm::ivec2 pixels)
 {
     pixelPosition = pixels;
     updatePixelPosition();
