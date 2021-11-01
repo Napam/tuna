@@ -3,8 +3,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <cmath>
-#include <glm/glm.hpp>
-#include <glm/gtx/io.hpp>
+#include "pch.h"
 #include "../include/baseState.hpp"
 #include "../include/utils.hpp"
 #include "../include/simpleState.hpp"
@@ -15,7 +14,7 @@
 using json = nlohmann::json;
 
 class Squareboy
-    : public BaseWorldObject
+    : public BaseWorldObject    
 {
 public:
     glm::vec2 velocity, acceleration;
