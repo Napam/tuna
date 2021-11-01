@@ -1,5 +1,5 @@
 CPPC = g++-11 -std=c++20 -Ofast
-OUT_FILE = testapp.out
+OUT_FILE = simpleapp.out
 COMPILER_FLAGS = -o $(OUT_FILE)
 MAIN_FILE = main.cpp
 LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx
@@ -10,7 +10,7 @@ SOURCES = $(wildcard states/*.cpp) \
 		  $(wildcard classes/*.cpp) \
 		  $(wildcard utils/*.cpp)
 
-testapp:
+simpleapp:
 	$(CPPC) $(COMPILER_FLAGS) $(MAIN_FILE) $(SOURCES) $(HEADERS) $(LINKS)
 
 mock:

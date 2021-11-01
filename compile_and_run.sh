@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make  && ./boids.out
+make  && ./$(grep -oP "OUT_FILE = \K[\w\.]+" Makefile)
