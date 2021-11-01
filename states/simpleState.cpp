@@ -56,13 +56,13 @@ void Squareboy::interactUser()
 {
     const Uint8 *keys = state->keystates;
 
-    if (keys[SDL_SCANCODE_A]) {acceleration[0] += 2;}
-    if (keys[SDL_SCANCODE_D]) {acceleration[0] -= 2;}
-    if (keys[SDL_SCANCODE_W]) { acceleration[1] += 2; }
-    if (keys[SDL_SCANCODE_S]) { acceleration[1] -= 2; }
-    if (keys[SDL_SCANCODE_SPACE]) { acceleration *= 6; }
-    if (keys[SDL_SCANCODE_LSHIFT]) { acceleration /= 6; }
-    if (keys[SDL_SCANCODE_C]) { velocity -= velocity * 0.1 * state->worldDt; }
+    if (keys[SDL_SCANCODE_A])        { acceleration[0] += 2; }
+    if (keys[SDL_SCANCODE_D])        { acceleration[0] -= 2; }
+    if (keys[SDL_SCANCODE_W])        { acceleration[1] += 2; }
+    if (keys[SDL_SCANCODE_S])        { acceleration[1] -= 2; }
+    if (keys[SDL_SCANCODE_SPACE])    { acceleration *= 6; }
+    if (keys[SDL_SCANCODE_LSHIFT])   { acceleration /= 6; }
+    if (keys[SDL_SCANCODE_C])        { velocity -= velocity * 0.1 * state->worldDt; }
 
     Eigen::Array2f diff;
     float norm;
@@ -277,12 +277,12 @@ void SimpleState::onMouseUp()
 
 void SimpleState::onMousewheel(Sint32 horizontal, Sint32 vertical)
 {
-    if (vertical > 0 ) { // Up
-        worldSize *= 1.05;
-    }
-
-    if (vertical < 0) { // Down
-        worldSize /= 1.05;
+    float val = 1.05;
+    float multiplier = vertical > 0 ? val : 1 / val;
+    worldSize *= multiplier;
+    for (void *ent : *entities)
+    {
+        
     }
 }
 

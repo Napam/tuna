@@ -26,7 +26,7 @@ protected:
 public:
     Uint8 targetFps;
     float targetFrameTime;
-    Uint32 prevTime; // Used for delay
+    Uint32 prevTime;  // Used for delay
     Uint32 frameTime; // Used for physics
 
     Clock(Uint8 targetFps);
@@ -46,7 +46,7 @@ Use for handling single key stroke stuff or something
 class StateEventListener
 {
 public:
-    virtual ~StateEventListener() {}; // StackOverflow said it was good to do this
+    virtual ~StateEventListener(){}; // StackOverflow said it was good to do this
     virtual void onKeyDown(SDL_Keycode key) = 0;
     virtual void onKeyUp(SDL_Keycode key) = 0;
     virtual void onMouseDown() = 0;
@@ -76,7 +76,7 @@ public:
     MousePointer *mousePointer;
     Eigen::Array2i pixelSize; // Window size in pixels
     Eigen::Array2f worldSize; // Window size in world units, initialized in child classes
-    json &config; // Config json reader thing
+    json &config;             // Config json reader thing
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
     virtual ~BaseState();
@@ -106,7 +106,7 @@ public:
     /*
     Runs state, this should not be overriden. 
     */
-    BaseState* run();
+    BaseState *run();
 
     /*
     Abstract function, should implement what to do in one application iteration.
@@ -114,36 +114,47 @@ public:
     virtual void update() = 0;
 };
 
+typedef struct PixelRect
+{
+    int x, y, w, h;
+} PixelRect;
+
+typedef struct WorldRect
+{
+    float x, y, w, h;
+} WorldRect;
+
 /*
 Base class for objects that should interact with BaseState
 */
-class BaseWorldObject 
+class BaseWorldObject
 {
 public:
-    SDL_Rect rect; // All objects are enclosed in their rects, representing their area
+    SDL_Rect rect;                // All objects are enclosed in their rects, representing their area
+    WorldRect worldRect;
     Eigen::Array2f worldPosition; // Position in world units
     Eigen::Array2i pixelPosition; // Position in pixel units
     BaseState *state;
     BaseWorldObject(BaseState *state, float x, float y, int w, int h); // Initialize with world coordinates
-    BaseWorldObject(BaseState *state, int x, int y, int w, int h); // Initialize with pixel coordinates
+    BaseWorldObject(BaseState *state, int x, int y, int w, int h);     // Initialize with pixel coordinates
 
     /*
      * Initializes rect to zero vector
      */
     BaseWorldObject(BaseState *state);
-    
-    virtual ~BaseWorldObject() {};
+
+    virtual ~BaseWorldObject(){};
     virtual void update() = 0;
 
     /*
     Draws rectangle
     */
-    void drawRect(); 
-    
+    void drawRect();
+
     /*
     Draws circle
     */
-    void drawCircle(Sint16 rad); 
+    void drawCircle(Sint16 rad);
 
     /*
     Convert world units to pixel coordinates
@@ -176,7 +187,7 @@ public:
     pixel values should be based on world attributes
     */
     void updateWorldPosition(float x, float y);
-    
+
     /*
     Accepts world position and synchronizes all attributes to world position, e.g. calculate what 
     pixel values should be based on world attributes
@@ -206,7 +217,7 @@ public:
     world values should be based on pixel attributes
     */
     void updatePixelPosition(int x, int y);
-    
+
     /*
     Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
     world values should be based on pixel attributes
@@ -231,12 +242,12 @@ public:
 /*
 A BaseWorldObject for the mousepointer. 
 */
-class MousePointer : public BaseWorldObject 
+class MousePointer : public BaseWorldObject
 {
 public:
     MousePointer(BaseState *state);
     virtual void update();
-    virtual void blit() {};
+    virtual void blit(){};
 };
 
 #endif
