@@ -196,12 +196,12 @@ void BaseWorldObject::drawCircle(Sint16 rad)
 
 int BaseWorldObject::worldToPixel(float unit, int dim)
 {
-    return static_cast<int>((unit / state->worldSize[dim]) * state->pixelSize[dim]);
+    return (unit / state->worldSize[dim]) * state->pixelSize[dim];
 }
 
 glm::ivec2 BaseWorldObject::worldToPixel(glm::vec2 units)
 {
-    return (((glm::ivec2)units / (glm::ivec2)state->worldSize) * state->pixelSize);
+    return (units / state->worldSize) * (glm::vec2)state->pixelSize;
 }
 
 float BaseWorldObject::pixelToWorld(int pixel, int dim)
@@ -211,7 +211,7 @@ float BaseWorldObject::pixelToWorld(int pixel, int dim)
 
 glm::vec2 BaseWorldObject::pixelToWorld(glm::ivec2 pixels)
 {
-    return (((glm::vec2)pixels / (glm::vec2)state->pixelSize) * state->worldSize);
+    return ((glm::vec2)pixels / (glm::vec2)state->pixelSize) * state->worldSize;
 }
 
 void BaseWorldObject::updateWorldPosition()

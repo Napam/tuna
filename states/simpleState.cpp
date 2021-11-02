@@ -58,13 +58,13 @@ void Squareboy::interactUser()
     if (keys[SDL_SCANCODE_LSHIFT])   { acceleration /= 6; }
     if (keys[SDL_SCANCODE_C])        { velocity -= velocity * 0.1f * state->worldDt; }
 
-    glm::vec2 diff;
-    float norm;
-    if (state->mouseRightIsDown) {
-        diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
-        norm = diff.length() + EPSILON; 
-        acceleration -= diff / norm * mouseForce;
-    }
+    // glm::vec2 diff;
+    // float norm;
+    // if (state->mouseRightIsDown) {
+    //     diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
+    //     norm = diff.length() + EPSILON; 
+    //     acceleration -= diff / norm * mouseForce;
+    // }
 }
 
 void Squareboy::behave()
