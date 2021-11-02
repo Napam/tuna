@@ -1,8 +1,4 @@
-#include <iostream>
-#include <tuple>
-#include <SDL2/SDL.h>
-#include <nlohmann/json.hpp>
-#include <fstream>
+#include "tunapch.h"
 #include "include/utils.hpp"
 #include "include/baseState.hpp"
 #include "include/simpleState.hpp"

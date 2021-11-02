@@ -1,8 +1,7 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-#include <iostream>
-#include <map>
+#include "tunapch.h"
 #include "baseState.hpp"
 
 class Manager

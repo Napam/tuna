@@ -1,6 +1,4 @@
-#include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtx/io.hpp>
+#include "include/tunapch.h"
 
 int main(int argc, char **argv)
 {

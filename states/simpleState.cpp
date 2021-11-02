@@ -1,14 +1,8 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <vector>
-#include <cmath>
-#include "pch.h"
+#include "tunapch.h"
 #include "../include/baseState.hpp"
 #include "../include/utils.hpp"
 #include "../include/simpleState.hpp"
 #include "../include/fonts.hpp"
-#include <iomanip>
 #define EPSILON 1e-6f
 
 using json = nlohmann::json;

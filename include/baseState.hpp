@@ -1,11 +1,7 @@
 #ifndef BASE_STATE_H
 #define BASE_STATE_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-#include <vector>
-#include "pch.h"
-#include <nlohmann/json.hpp>
+#include "tunapch.h"
 
 using json = nlohmann::json;
 
