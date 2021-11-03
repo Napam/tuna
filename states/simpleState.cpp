@@ -1,4 +1,4 @@
-#include "tunapch.h"
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 #include "../include/utils.hpp"
 #include "../include/simpleState.hpp"
@@ -62,7 +62,7 @@ void Squareboy::interactUser()
     // float norm;
     // if (state->mouseRightIsDown) {
     //     diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
-    //     norm = diff.length() + EPSILON; 
+    //     norm = glm::length(diff) + EPSILON; 
     //     acceleration -= diff / norm * mouseForce;
     // }
 }
@@ -85,8 +85,8 @@ void Squareboy::behave()
     {
         if (ent == this) { continue; }
 
-        diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + EPSILON;
-        norm = diff.length() + 1e-6; // Euclidean norm
+        diff = (worldPosition - (static_cast<BaseWorldObject *>(ent))->worldPosition) + EPSILON;
+        norm = glm::length(diff) + EPSILON; // Euclidean norm
 
         repelForce = std::min(repel / std::pow(norm, 2), 20.0);
         attractForce = std::min(attract / norm, 20.0F);
@@ -237,7 +237,7 @@ void SimpleState::logic()
                 glm::vec2 diff;
                 diff = ((BaseWorldObject *)ent)->worldPosition - mousePos;
                 
-                if (diff.length() < 500) {
+                if (glm::length(diff) < 500) {
                     delete (BaseWorldObject *)ent;
                     return true;
                 } else {

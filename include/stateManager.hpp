@@ -1,7 +1,7 @@
 #ifndef STATE_MANAGER_H
 #define STATE_MANAGER_H
 
-#include "tunapch.h"
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 
 class StateManager

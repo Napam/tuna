@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/io.hpp>
+#include <glm/gtx/norm.hpp>
 #include <nlohmann/json.hpp>
 
 #include <SDL2/SDL.h>

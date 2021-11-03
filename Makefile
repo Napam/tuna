@@ -14,13 +14,14 @@ simpleapp:
 	$(CPPC) $(COMPILER_FLAGS) -o $(OUT_FILE) $(MAIN_FILE) $(SOURCES) $(HEADERS) $(LINKS)
 
 pch:
-	$(CPPC) $(COMPILER_FLAGS) include/tunapch.h 
+	$(CPPC) $(COMPILER_FLAGS) include/tunapch.hpp
 
 mock:
 	$(CPPC) -o mock.out mock.cpp $(SOURCES) $(HEADERS) $(LINKS)
 
 glm:
 	$(CPPC) $(COMPILER_FLAGS) -o glm.out testglm.cpp $(HEADERS) $(LINKS)
+	./glm.out
 
 clean:
 	rm $(OUT_FILE)

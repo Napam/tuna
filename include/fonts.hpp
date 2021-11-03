@@ -1,7 +1,7 @@
 #ifndef FONTS_H
 #define FONTS_H
 
-#include "tunapch.h"
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 
 using json = nlohmann::json;

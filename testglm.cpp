@@ -1,10 +1,11 @@
-#include "include/tunapch.h"
+#include "include/tunapch.hpp"
 
 int main(int argc, char **argv)
 {
-    glm::ivec3 vec(1,2,3);
+    glm::vec3 vec(1,1,1);
+    std::cout << glm::length(vec) << "\n";
     vec = vec + vec;
-    vec = vec * 4 + vec;
+    vec = vec * 4.0f + vec;
     std::cout << vec << "\n";
     return 0;
 } 

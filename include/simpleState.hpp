@@ -1,7 +1,7 @@
 #ifndef SIMPLE_STATE_H
 #define SIMPLE_STATE_H
 
-#include "tunapch.h"
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 
 using json = nlohmann::json;

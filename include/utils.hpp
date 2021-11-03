@@ -1,7 +1,7 @@
 #ifndef UTILS_H 
 #define UTILS_H
 
-#include "tunapch.h"
+#include "tunapch.hpp"
 
 /*
 Assigns pointers inplace
