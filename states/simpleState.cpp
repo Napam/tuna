@@ -92,7 +92,7 @@ void Squareboy::behave()
         if (ent == this) { continue; }
 
         diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + EPSILON;
-        norm = diff.matrix().squaredNorm() + 1e-6; // Euclidean norm
+        norm = diff.matrix().squaredNorm() + 1e-6; // SQUARED Euclidean norm e.g. x^2+y^2
 
         repelForce = std::min(repel / std::pow(norm, 2), 20.0);
         attractForce = std::min(attract / norm, 20.0F);
