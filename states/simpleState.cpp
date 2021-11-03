@@ -3,7 +3,7 @@
 #include "../include/utils.hpp"
 #include "../include/simpleState.hpp"
 #include "../include/fonts.hpp"
-#define EPSILON 1e-6f
+#define EPSILON 1e-4f
 
 using json = nlohmann::json;
 
@@ -58,13 +58,13 @@ void Squareboy::interactUser()
     if (keys[SDL_SCANCODE_LSHIFT])   { acceleration /= 6; }
     if (keys[SDL_SCANCODE_C])        { velocity -= velocity * 0.1f * state->worldDt; }
 
-    // glm::vec2 diff;
-    // float norm;
-    // if (state->mouseRightIsDown) {
-    //     diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
-    //     norm = glm::length(diff) + EPSILON; 
-    //     acceleration -= diff / norm * mouseForce;
-    // }
+    glm::vec2 diff;
+    float norm;
+    if (state->mouseRightIsDown) {
+        diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
+        norm = glm::length(diff) + EPSILON; 
+        acceleration -= diff / (static_cast<float>(std::pow(norm, 2)) + norm) * mouseForce;
+    }
 }
 
 void Squareboy::behave()
@@ -88,8 +88,8 @@ void Squareboy::behave()
         diff = (worldPosition - (static_cast<BaseWorldObject *>(ent))->worldPosition) + EPSILON;
         norm = glm::length(diff) + EPSILON; // Euclidean norm
 
-        repelForce = std::min(repel / std::pow(norm, 2), 20.0);
-        attractForce = std::min(attract / norm, 20.0F);
+        repelForce = std::min(repel / std::pow(norm, 2), 10.0);
+        attractForce = std::min(attract / norm, 10.0F);
 
         diff /= norm;
         acceleration += diff * (repelForce - attractForce);
