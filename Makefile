@@ -6,6 +6,8 @@ LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx
 BUILD_DIR = build
 INCLUDES = -Iinclude
 
+MAKEFLAGS += -j$(shell nproc --all)
+
 SOURCES = $(wildcard states/*.cpp) \
 		  $(wildcard classes/*.cpp) \
 		  $(wildcard utils/*.cpp)
