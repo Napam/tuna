@@ -62,6 +62,10 @@ void Squareboy::interactUser()
     float norm;
     if (state->mouseRightIsDown) {
         diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
+        diff = diff * 10.0f;
+        diff = diff * 10.0f + 100.0f;
+
+        
         norm = glm::length(diff) + EPSILON; 
         acceleration -= diff / (static_cast<float>(std::pow(norm, 2)) + norm) * mouseForce;
     }
