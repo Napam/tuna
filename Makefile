@@ -1,29 +1,29 @@
-CPPC = g++-11 
+CXX = g++-11 
+CXXFLAGS = -std=c++20 -Ofast -Winvalid-pch
 OUT_FILE = simpleapp.out
-COMPILER_FLAGS = -std=c++20 -Ofast -Winvalid-pch
 MAIN_FILE = main.cpp
 LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx
-
-HEADERS = -Iinclude
+BUILD_DIR = build
+INCLUDES = -Iinclude
 
 SOURCES = $(wildcard states/*.cpp) \
 		  $(wildcard classes/*.cpp) \
 		  $(wildcard utils/*.cpp)
 
-simpleapp:
-	$(CPPC) $(COMPILER_FLAGS) -o $(OUT_FILE) $(MAIN_FILE) $(SOURCES) $(HEADERS) $(LINKS)
+OBJECTS = $(BUILD_DIR)/$(MAIN_FILE:.cpp=.o) \
+		  $(shell echo $(SOURCES) | sed -E "s|\w+/(\w+).cpp|$(BUILD_DIR)/\1.o|g")
 
-pch:
-	$(CPPC) $(COMPILER_FLAGS) include/tunapch.hpp
+default: $(OUT_FILE)
 
-mock:
-	$(CPPC) -o mock.out mock.cpp $(SOURCES) $(HEADERS) $(LINKS)
+$(OUT_FILE): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $(INCLUDES) $(LINKS) -o $@
 
-glm:
-	$(CPPC) $(COMPILER_FLAGS) -o glm.out testglm.cpp $(HEADERS) $(LINKS)
-	./glm.out
+VPATH = states classes utils
+
+$(BUILD_DIR)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@ 
+
+.PHONY: clean
 
 clean:
-	rm $(OUT_FILE)
-	rm mock.out
-	rm glm.out
+	rm -f $(OUT_FILE) build/*.o
