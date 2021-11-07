@@ -1,10 +1,7 @@
 #ifndef FONTS_H
 #define FONTS_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <iostream>
-#include <nlohmann/json.hpp>
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 
 using json = nlohmann::json;

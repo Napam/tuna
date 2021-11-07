@@ -1,10 +1,8 @@
 #ifndef SIMPLE_STATE_H
 #define SIMPLE_STATE_H
 
-#include <SDL2/SDL.h>
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
-#include <vector>
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

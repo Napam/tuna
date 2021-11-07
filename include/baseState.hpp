@@ -1,11 +1,7 @@
 #ifndef BASE_STATE_H
 #define BASE_STATE_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-#include <vector>
-#include <eigen3/Eigen/Dense>
-#include <nlohmann/json.hpp>
+#include "tunapch.hpp"
 
 using json = nlohmann::json;
 
@@ -74,8 +70,8 @@ public:
     const Uint8 *keystates;
     Clock clock;
     MousePointer *mousePointer;
-    Eigen::Array2i pixelSize; // Window size in pixels
-    Eigen::Array2f worldSize; // Window size in world units, initialized in child classes
+    glm::ivec2 pixelSize; // Window size in pixels
+    glm::vec2 worldSize; // Window size in world units, initialized in child classes
     json &config;             // Config json reader thing
 
     BaseState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, json &config);
@@ -130,10 +126,10 @@ Base class for objects that should interact with BaseState
 class BaseWorldObject
 {
 public:
-    SDL_Rect rect;                // All objects are enclosed in their rects, representing their area
+    SDL_Rect rect;        // All objects are enclosed in their rects, representing their area
     WorldRect worldRect;
-    Eigen::Array2f worldPosition; // Position in world units
-    Eigen::Array2i pixelPosition; // Position in pixel units
+    glm::vec2 worldPosition; // Position in world units
+    glm::ivec2 pixelPosition; // Position in pixel units
     BaseState *state;
     BaseWorldObject(BaseState *state, float x, float y, int w, int h); // Initialize with world coordinates
     BaseWorldObject(BaseState *state, int x, int y, int w, int h);     // Initialize with pixel coordinates
@@ -164,7 +160,7 @@ public:
     /*
     Convert world units to pixel coordinates
     */
-    Eigen::Array2i worldToPixel(Eigen::Array2f units);
+    glm::ivec2 worldToPixel(glm::vec2 units);
 
     /*
     Comvert pixel coordinates to world units
@@ -174,7 +170,7 @@ public:
     /*
     Comvert pixel coordinates to world units
     */
-    Eigen::Array2f pixelToWorld(Eigen::Array2i pixels);
+    glm::vec2 pixelToWorld(glm::ivec2 pixels);
 
     /*
     Synchronizes all attributes to world position, e.g. calculate what pixel values should be based 
@@ -192,7 +188,7 @@ public:
     Accepts world position and synchronizes all attributes to world position, e.g. calculate what 
     pixel values should be based on world attributes
     */
-    void updateWorldPosition(Eigen::Array2f units);
+    void updateWorldPosition(glm::vec2 units);
 
     /*
     Sets world position attributes and synchronizes all attributes to world position, e.g. calculate 
@@ -222,7 +218,7 @@ public:
     Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 
     world values should be based on pixel attributes
     */
-    void updatePixelPosition(Eigen::Array2i pixels);
+    void updatePixelPosition(glm::ivec2 pixels);
 
     /*
     Sets pixel attributes and synchronizes all attributes to pixel position, e.g. calculate what 

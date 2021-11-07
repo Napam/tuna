@@ -1,23 +1,17 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <vector>
-#include <cmath>
+#include "tunapch.hpp"
 #include "../include/baseState.hpp"
 #include "../include/utils.hpp"
 #include "../include/simpleState.hpp"
 #include "../include/fonts.hpp"
-#include <eigen3/Eigen/Dense>
-#include <iomanip>
-#define EPSILON 1e-6
+#define EPSILON 1e-4f
 
 using json = nlohmann::json;
 
 class Squareboy
-    : public BaseWorldObject
+    : public BaseWorldObject    
 {
 public:
-    Eigen::Array2f velocity, acceleration;
+    glm::vec2 velocity, acceleration;
     float repel{state->config["simple"]["misc"]["repel"]}, attract{state->config["simple"]["misc"]["attract"]};
     Sint16 circleRadius{state->config["debug"]["circleRadius"]};
     float mouseForce{state->config["simple"]["misc"]["mouseForce"]};
@@ -62,20 +56,20 @@ void Squareboy::interactUser()
     if (keys[SDL_SCANCODE_S])        { acceleration[1] -= 2; }
     if (keys[SDL_SCANCODE_SPACE])    { acceleration *= 6; }
     if (keys[SDL_SCANCODE_LSHIFT])   { acceleration /= 6; }
-    if (keys[SDL_SCANCODE_C])        { velocity -= velocity * 0.1 * state->worldDt; }
+    if (keys[SDL_SCANCODE_C])        { velocity -= velocity * 0.1f * state->worldDt; }
 
-    Eigen::Array2f diff;
+    glm::vec2 diff;
     float norm;
     if (state->mouseRightIsDown) {
-        diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;
-        norm = diff.matrix().squaredNorm() + EPSILON; 
-        acceleration -= diff / norm * mouseForce;
+        diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;    
+        norm = glm::length(diff) + EPSILON; 
+        acceleration -= diff / (static_cast<float>(std::pow(norm, 2)) + 2*norm) * mouseForce;
     }
 }
 
 void Squareboy::behave()
 {
-    Eigen::Array2f diff;
+    glm::vec2 diff;
     float repelForce, norm, attractForce;
     std::vector<void *> entites;
 
@@ -91,11 +85,11 @@ void Squareboy::behave()
     {
         if (ent == this) { continue; }
 
-        diff = (worldPosition - ((BaseWorldObject *)ent)->worldPosition) + EPSILON;
-        norm = diff.matrix().squaredNorm() + 1e-6; // SQUARED Euclidean norm e.g. x^2+y^2
+        diff = (worldPosition - (static_cast<BaseWorldObject *>(ent))->worldPosition) + EPSILON;
+        norm = glm::length(diff) + EPSILON; // Euclidean norm
 
-        repelForce = std::min(repel / std::pow(norm, 2), 20.0);
-        attractForce = std::min(attract / norm, 20.0F);
+        repelForce = std::min(repel / std::pow(norm, 2), 10.0);
+        attractForce = std::min(attract / norm, 10.0F);
 
         diff /= norm;
         acceleration += diff * (repelForce - attractForce);
@@ -104,19 +98,19 @@ void Squareboy::behave()
 
 void Squareboy::motion()
 {
-    float accnorm = acceleration.matrix().squaredNorm();
+    float accnorm = acceleration.length();
     if (accnorm > maxAcc) {
         acceleration = acceleration / accnorm * maxAcc;
     }
 
     velocity += acceleration * state->worldDt;
-    velocity -= velocity * 0.08 * state->worldDt;
+    velocity -= velocity * 0.08f * state->worldDt;
     updateWorldPosition(worldPosition + velocity * state->worldDt);
 }
 
 void Squareboy::update()
 {
-    acceleration = 0;
+    acceleration *= 0;
     interactUser();
     behave();
     motion();
@@ -180,7 +174,7 @@ SimpleState::SimpleState(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *
         worldWidth = unitPerPixel * pixelSize[0];
     }
 
-    this->worldSize << worldWidth, worldHeight;
+    this->worldSize = {worldWidth, worldHeight};
 
     // Grid of squarebois
     int n = config["simple"]["misc"]["nStartBoxes"].get<int>();
@@ -240,10 +234,10 @@ void SimpleState::logic()
     {   
         std::erase_if(*entities, 
             [mousePos = mousePointer->worldPosition](void *ent){
-                Eigen::Array2f diff;
+                glm::vec2 diff;
                 diff = ((BaseWorldObject *)ent)->worldPosition - mousePos;
                 
-                if (diff.matrix().squaredNorm() < 500) {
+                if (glm::length(diff) < 500) {
                     delete (BaseWorldObject *)ent;
                     return true;
                 } else {

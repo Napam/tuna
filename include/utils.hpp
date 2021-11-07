@@ -1,8 +1,7 @@
 #ifndef UTILS_H 
 #define UTILS_H
 
-#include <iostream>
-#include <SDL2/SDL.h>
+#include "tunapch.hpp"
 
 /*
 Assigns pointers inplace
