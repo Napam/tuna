@@ -18,7 +18,7 @@ OBJECTS = $(BUILD_DIR)/$(MAIN_FILE:.cpp=.o) \
 
 default: $(OUT_FILE)
 
-$(OUT_FILE): $(OBJECTS)
+$(OUT_FILE): $(OBJECTS) $(PCH_FILE)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(INCLUDES) $(LINKS) -o $@
 
 VPATH = states classes utils
@@ -26,10 +26,12 @@ VPATH = states classes utils
 $(BUILD_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@ 
 
-pch: $(PCH_FILE)
+$(PCH_FILE).gch: $(PCH_FILE)
 	$(CXX) $(CXXFLAGS) $(PCH_FILE) 
 
 .PHONY: clean
 
 clean:
-	rm -f $(OUT_FILE) build/*.o
+	rm -f $(OUT_FILE) \
+		  $(BUILD_DIR)/*.o \
+		  $(PCH_FILE).gch

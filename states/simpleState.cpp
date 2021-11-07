@@ -14,7 +14,8 @@ public:
     glm::vec2 velocity, acceleration;
     float repel{state->config["simple"]["misc"]["repel"]}, attract{state->config["simple"]["misc"]["attract"]};
     Sint16 circleRadius{state->config["debug"]["circleRadius"]};
-    float mouseForce{state->config["simple"]["misc"]["mouseForce"]};
+    float mouseForceQuadratic{state->config["simple"]["misc"]["mouseForceQuadratic"]};
+    float mouseForceLinear{state->config["simple"]["misc"]["mouseForceLinear"]};
     float maxAcc{state->config["simple"]["misc"]["maxAcc"]};
     Squareboy(BaseState *state, float x, float y, int w, int h);
     Squareboy(BaseState *state, int x, int y, int w, int h);
@@ -63,7 +64,9 @@ void Squareboy::interactUser()
     if (state->mouseRightIsDown) {
         diff = (worldPosition - state->mousePointer->worldPosition) + EPSILON;    
         norm = glm::length(diff) + EPSILON; 
-        acceleration -= diff / (static_cast<float>(std::pow(norm, 2)) + 2*norm) * mouseForce;
+        acceleration -= 
+              diff * mouseForceQuadratic / static_cast<float>(std::pow(norm, 2))
+            + diff * mouseForceLinear / norm;
     }
 }
 
@@ -237,7 +240,7 @@ void SimpleState::logic()
                 glm::vec2 diff;
                 diff = ((BaseWorldObject *)ent)->worldPosition - mousePos;
                 
-                if (glm::length(diff) < 500) {
+                if (glm::length(diff) < 25) {
                     delete (BaseWorldObject *)ent;
                     return true;
                 } else {

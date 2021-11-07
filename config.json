@@ -17,7 +17,8 @@
             "nStartBoxes":5,
             "repel":100,
             "attract":1,
-            "mouseForce":100,
+            "mouseForceQuadratic":10,
+            "mouseForceLinear":0.5,
             "maxAcc":2
         }
     }
