@@ -14,9 +14,12 @@ SOURCES = $(wildcard states/*.cpp) \
 		  $(wildcard utils/*.cpp)
 
 OBJECTS = $(BUILD_DIR)/$(MAIN_FILE:.cpp=.o) \
-		  $(shell echo $(SOURCES) | sed -E "s|\w+/(\w+).cpp|$(BUILD_DIR)/\1.o|g")
+		  $(addprefix $(BUILD_DIR)/, $(notdir $(SOURCES:.cpp=.o)))
 
 default: $(OUT_FILE)
+
+run: $(OUT_FILE)
+	./$(OUT_FILE)
 
 $(OUT_FILE): $(OBJECTS) $(PCH_FILE)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(INCLUDES) $(LINKS) -o $@
@@ -24,14 +27,19 @@ $(OUT_FILE): $(OBJECTS) $(PCH_FILE)
 VPATH = states classes utils
 
 $(BUILD_DIR)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@ 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(PCH_FILE).gch: $(PCH_FILE)
 	$(CXX) $(CXXFLAGS) $(PCH_FILE) 
 
+$(OBJECTS): | $(BUILD_DIR)
+
+$(BUILD_DIR):
+	mkdir build
+
 .PHONY: clean
 
 clean:
-	rm -f $(OUT_FILE) \
-		  $(BUILD_DIR)/*.o \
+	rm -rf $(OUT_FILE) \
+		  $(BUILD_DIR) \
 		  $(PCH_FILE).gch
