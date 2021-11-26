@@ -12,4 +12,9 @@ $(OUT_FILE): | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SOURCE) -o $(BUILD_DIR)/$@
 
 $(BUILD_DIR):
-	mkdir build
+	mkdir $(BUILD_DIR)
+
+.PHONY: clean
+
+clean:
+	rm -rf $(BUILD_DIR)
