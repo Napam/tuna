@@ -37,10 +37,13 @@ $(PCH_FILE).gch: $(PCH_FILE)
 $(OBJECTS): | $(BUILD_DIR)
 
 $(BUILD_DIR):
-	mkdir build
+	mkdir $(BUILD_DIR)
 	$(MAKE) -C vendor/Glad
 
-.PHONY: clean glad 
+.PHONY: clean clean-all
+
+clean-all: clean
+	$(MAKE) -C vendor/Glad clean
 
 clean:
 	rm -rf $(OUT_FILE) \
