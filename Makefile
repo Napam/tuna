@@ -4,9 +4,13 @@ OUT_FILE = simpleapp.out
 MAIN_FILE = main.cpp
 PCH_FILE = include/tunapch.hpp
 LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx -ldl
-INCLUDES = -Iinclude
-VENDOR = vendor
+VENDOR_DIR = vendor
 export BUILD_DIR = build
+
+INCLUDES = -Iinclude \
+		   -I$(VENDOR_DIR_DIR)/Glad/include \
+		   -I$(VENDOR_DIR)/json/single_include \
+		   -I$(VENDOR_DIR)/glm
 
 MAKEFLAGS += -j$(shell nproc --all)
 
@@ -16,7 +20,7 @@ SOURCES = $(wildcard states/*.cpp) \
 
 OBJECTS = $(BUILD_DIR)/$(MAIN_FILE:.cpp=.o) \
 		  $(addprefix $(BUILD_DIR)/, $(notdir $(SOURCES:.cpp=.o))) \
-		  $(VENDOR)/Glad/$(BUILD_DIR)/glad.o
+		  $(VENDOR_DIR)/Glad/$(BUILD_DIR)/glad.o
 
 default: $(OUT_FILE)
 
@@ -32,18 +36,18 @@ $(BUILD_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(PCH_FILE).gch: $(PCH_FILE)
-	$(CXX) $(CXXFLAGS) $(PCH_FILE) 
+	$(CXX) $(CXXFLAGS) $(PCH_FILE)
 
 $(OBJECTS): | $(BUILD_DIR)
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
-	$(MAKE) -C vendor/Glad
+	$(MAKE) -C $(VENDOR_DIR)/Glad
 
 .PHONY: clean clean-all
 
 clean-all: clean
-	$(MAKE) -C vendor/Glad clean
+	$(MAKE) -C $(VENDOR_DIR)/Glad clean
 
 clean:
 	rm -rf $(OUT_FILE) \
