@@ -1,8 +1,8 @@
+#include "../include/tunapch.hpp"
 #include "../include/utils.hpp"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
-void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int width, int height)
+void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, SDL_GLContext **context,
+                             int width, int height)
 {
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -17,11 +17,19 @@ void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int w
         goto error;
     }
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
     *window = SDL_CreateWindow("SDL2 Window",
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
                                width, height,
-                               0);
+                               SDL_WINDOW_OPENGL);
+    
+    // **context = SDL_GL_CreateContext(*window);
 
     if(!(*window))
     {

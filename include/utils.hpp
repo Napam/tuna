@@ -6,7 +6,8 @@
 /*
 Assigns pointers inplace
 */
-void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, int width, int height);
+void CreateWindowAndRenderer(SDL_Window **window, SDL_Renderer **renderer, SDL_GLContext **context,
+                             int width, int height);
 
 /*
 Python style modulo

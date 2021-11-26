@@ -2,6 +2,7 @@
 #include "include/utils.hpp"
 #include "include/baseState.hpp"
 #include "include/simpleState.hpp"
+#include "include/simpleGlState.hpp"
 #include "include/manager.hpp"
 
 using json = nlohmann::json;
@@ -10,6 +11,7 @@ class GameApp {
 public:
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_GLContext *context;
     SDL_Event event;
     SimpleState *simpleState;
     BaseState *currentState;
@@ -20,12 +22,14 @@ public:
         json j3 = json::parse(configstream);
 
         CreateWindowAndRenderer(
-            &window, &renderer, j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
+            &window, &renderer, &context, 
+            j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
         );
 
         manager.addState("simple", new SimpleState(window, renderer, &event, j3, 2000, -1));
+        manager.addState("simpleGl", new SimpleGlState(window, renderer, &event, j3, 2000, -1));
 
-        currentState = manager.getState("simple");
+        currentState = manager.getState("simpleGl");
         currentState->activate();
         while (currentState = currentState->run());
     }

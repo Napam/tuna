@@ -8,9 +8,9 @@ VENDOR_DIR = vendor
 export BUILD_DIR = build
 
 INCLUDES = -Iinclude \
-		   -I$(VENDOR_DIR_DIR)/Glad/include \
-		   -I$(VENDOR_DIR)/json/single_include \
-		   -I$(VENDOR_DIR)/glm
+		   -isystem $(VENDOR_DIR_DIR)/Glad/include \
+		   -isystem $(VENDOR_DIR)/json/single_include \
+		   -isystem $(VENDOR_DIR)/glm
 
 MAKEFLAGS += -j$(shell nproc --all)
 
