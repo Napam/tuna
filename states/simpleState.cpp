@@ -44,17 +44,9 @@ SimpleState::~SimpleState()
 
 void SimpleState::updateGraphics()
 {
-    // glClearColor(0, 0, 0, 1);
-
-    // // You'd want to use modern OpenGL here
-    // glColor3d(0, 1, 0);
-    // glBegin(GL_TRIANGLES);
-    //     glVertex2f(.2, 0);
-    //     glVertex2f(.01, .2);
-    //     glVertex2f(-.2, 0);
-    // glEnd();
-
-    // SDL_GL_SwapWindow(window);
+    glClearColor(1.0f,1.0f,0.0f,1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    SDL_GL_SwapWindow(window);
 }
 
 void SimpleState::logic()
