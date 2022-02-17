@@ -12,7 +12,6 @@
 #include <glm/gtx/io.hpp>
 #include <glm/gtx/norm.hpp>
 #include <nlohmann/json.hpp>
+#include <glad/glad.h>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL2_gfxPrimitives.h>

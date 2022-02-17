@@ -191,7 +191,6 @@ void BaseWorldObject::drawRect()
 
 void BaseWorldObject::drawCircle(Sint16 rad)
 {
-    filledCircleRGBA(state->renderer, rect.x, rect.y, rad, 20, 255, 10, 255);
 }
 
 int BaseWorldObject::worldToPixel(float unit, int dim)

@@ -3,12 +3,12 @@ CXXFLAGS = -std=c++20 -Ofast -Winvalid-pch
 OUT_FILE = simpleapp.out
 MAIN_FILE = main.cpp
 PCH_FILE = include/tunapch.hpp
-LINKS = -lSDL2 -lSDL2_ttf -lSDL2_gfx -ldl
+LINKS = -lSDL2 -ldl -lGL
 VENDOR_DIR = vendor
 export BUILD_DIR = build
 
 INCLUDES = -Iinclude \
-		   -isystem $(VENDOR_DIR_DIR)/Glad/include \
+		   -isystem $(VENDOR_DIR)/Glad/include \
 		   -isystem $(VENDOR_DIR)/json/single_include \
 		   -isystem $(VENDOR_DIR)/glm
 

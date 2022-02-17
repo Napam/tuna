@@ -2,7 +2,6 @@
 #include "include/utils.hpp"
 #include "include/baseState.hpp"
 #include "include/simpleState.hpp"
-#include "include/simpleGlState.hpp"
 #include "include/manager.hpp"
 
 using json = nlohmann::json;
@@ -26,10 +25,47 @@ public:
             j3["window"]["width"].get<int>(), j3["window"]["height"].get<int>()
         );
 
-        manager.addState("simple", new SimpleState(window, renderer, &event, j3, 2000, -1));
-        manager.addState("simpleGl", new SimpleGlState(window, renderer, &event, j3, 2000, -1));
+        // Create an event handler
+        SDL_Event event;
+        // Loop condition
+        bool running = true;
 
-        currentState = manager.getState("simpleGl");
+        while (running) {
+            SDL_PollEvent(&event);
+
+            switch(event.type) {
+            case SDL_QUIT:
+                running = false;
+                break;
+
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    running = false;
+                    break;
+                }
+            }
+
+            glClearColor(1.0f,1.0f,0.0f,1.0f);
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        SDL_GL_SwapWindow(window);
+
+            SDL_GL_SwapWindow(window);
+        }
+
+        // Destroy everything to not leak memory.
+        // SDL_GL_DeleteContext(gl_context);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+
+        SDL_Quit();
+
+        return;
+
+        manager.addState("simple", new SimpleState(window, renderer, &event, j3, 2000, -1));
+
+        currentState = manager.getState("simple");
         currentState->activate();
         while (currentState = currentState->run());
     }
